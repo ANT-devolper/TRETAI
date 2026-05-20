@@ -1,8 +1,8 @@
 import { COLS, ROWS } from './constants.js';
 
-export function computeLayout() {
-  const vw = document.documentElement.clientWidth;
-  const vh = document.documentElement.clientHeight;
+export function computeLayout(vw, vh) {
+  if (vw === undefined) vw = document.documentElement.clientWidth;
+  if (vh === undefined) vh = document.documentElement.clientHeight;
   const panelWidth = Math.max(140, Math.min(200, vw * 0.18));
   const gap = Math.max(8, Math.min(24, vw * 0.015));
   const pad = Math.max(8, Math.min(20, vh * 0.015)) * 2 + 4;
