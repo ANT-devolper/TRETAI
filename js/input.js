@@ -12,6 +12,8 @@ const KEY_MAP = {
   C: 'hold',
   p: 'pause',
   P: 'pause',
+  m: 'toggleMusic',
+  M: 'toggleMusic',
 };
 
 export function bindKeyboard(handlers) {

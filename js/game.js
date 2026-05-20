@@ -6,10 +6,11 @@ import {
   drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview,
 } from './render.js';
 import {
-  dom, ctx, nextCtx, holdCtx, renderStats, showOverlay, hideOverlay,
+  dom, ctx, nextCtx, holdCtx, renderStats, showOverlay, hideOverlay, renderMusicState,
 } from './ui.js';
 import { computeLayout } from './resize.js';
 import { bindKeyboard } from './input.js';
+import * as audio from './audio.js';
 
 const state = {
   board: null,
@@ -58,6 +59,7 @@ function spawn(piece) {
   if (collides(state.board, state.current)) {
     state.gameOver = true;
     showOverlay('FIM DE JOGO', true);
+    audio.duck(true);
   }
 }
 
@@ -130,8 +132,10 @@ function togglePause() {
   state.paused = !state.paused;
   if (state.paused) {
     showOverlay('PAUSADO');
+    audio.duck(true);
   } else {
     hideOverlay();
+    audio.duck(false);
     state.lastDrop = 0;
   }
 }
@@ -194,6 +198,7 @@ function reset() {
   renderHold();
   renderStats(state.score, state.lines, state.level);
   hideOverlay();
+  audio.duck(false);
 }
 
 export function start() {
@@ -207,8 +212,12 @@ export function start() {
     hardDrop: withTurn(hardDrop),
     hold: withTurn(holdAction),
     pause: togglePause,
+    toggleMusic: () => audio.toggle(),
   });
   window.addEventListener('resize', applyLayout);
   dom.restartBtn.addEventListener('click', reset);
+  dom.musicBtn.addEventListener('click', () => audio.toggle());
+  audio.onStateChange(renderMusicState);
+  renderMusicState({ playing: audio.isPlaying() });
   requestAnimationFrame(loop);
 }

@@ -79,6 +79,32 @@ canvas {
   min-width: 56px;
 }
 
+.music-btn {
+  width: 100%;
+  padding: clamp(6px, 1vh, 10px);
+  background: #0ff;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: clamp(11px, 1.4vh, 14px);
+  transition: background 0.15s;
+}
+
+.music-btn:hover {
+  background: #0cc;
+}
+
+.music-btn[data-state="playing"] {
+  background: #f0a000;
+}
+
+.music-btn[data-state="playing"]:hover {
+  background: #cc8a00;
+}
+
 .board-wrap {
   position: relative;
 }

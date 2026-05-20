@@ -28,3 +28,8 @@ export const SCROLL_KEYS = [
   'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
   ' ', 'PageUp', 'PageDown', 'Home', 'End',
 ];
+
+export const STREAM_URL = 'https://ice1.somafm.com/groovesalad-128-mp3';
+export const DEFAULT_VOLUME = 0.6;
+export const DUCK_VOLUME = 0.2;
+export const STORAGE_KEY_MUTED = 'tetris.music.muted';

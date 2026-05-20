@@ -9,6 +9,7 @@ export const dom = {
   overlayText: document.getElementById('overlayText'),
   restartBtn: document.getElementById('restartBtn'),
   panel: document.querySelector('.panel'),
+  musicBtn: document.getElementById('musicBtn'),
 };
 
 export const ctx = dom.canvas.getContext('2d');
@@ -30,4 +31,10 @@ export function showOverlay(text, withRestart = false) {
 export function hideOverlay() {
   dom.overlay.classList.remove('show');
   dom.restartBtn.classList.remove('show');
+}
+
+export function renderMusicState({ playing }) {
+  if (!dom.musicBtn) return;
+  dom.musicBtn.textContent = playing ? '⏸ Pausar' : '▶ Tocar';
+  dom.musicBtn.dataset.state = playing ? 'playing' : 'paused';
 }
