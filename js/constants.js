@@ -33,3 +33,13 @@ export const STREAM_URL = 'https://ice1.somafm.com/groovesalad-128-mp3';
 export const DEFAULT_VOLUME = 0.6;
 export const DUCK_VOLUME = 0.2;
 export const STORAGE_KEY_MUTED = 'tetris.music.muted';
+
+export const SFX_VOLUME = 0.18;
+// [frequência Hz, offset segundos, duração segundos] — escala C maior, ascendente.
+// 4 linhas (tetris) acrescenta um C6 sustentado para soar triunfante.
+export const LINE_CLEAR_NOTES = {
+  1: [[523.25, 0.00, 0.12]],
+  2: [[523.25, 0.00, 0.10], [659.25, 0.08, 0.14]],
+  3: [[523.25, 0.00, 0.09], [659.25, 0.08, 0.09], [783.99, 0.16, 0.16]],
+  4: [[523.25, 0.00, 0.08], [659.25, 0.06, 0.08], [783.99, 0.12, 0.08], [1046.50, 0.18, 0.30]],
+};

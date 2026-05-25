@@ -87,6 +87,7 @@ function lockPiece() {
     state.level = levelFromLines(state.lines);
     state.dropInterval = dropIntervalForLevel(state.level);
     renderStats(state.score, state.lines, state.level);
+    audio.playLineClearSfx(cleared);
   }
   if (!state.gameOver) spawn();
 }

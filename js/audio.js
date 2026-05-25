@@ -1,8 +1,12 @@
-import { DEFAULT_VOLUME, DUCK_VOLUME, STORAGE_KEY_MUTED } from './constants.js';
+import {
+  DEFAULT_VOLUME, DUCK_VOLUME, STORAGE_KEY_MUTED,
+  SFX_VOLUME, LINE_CLEAR_NOTES,
+} from './constants.js';
 
 let audioEl = null;
 let userPaused = false;
 let armed = false;
+let sfxCtx = null;
 const stateListeners = [];
 
 function loadUserPaused() {
@@ -79,4 +83,43 @@ export function armOnFirstGesture() {
 
 export function onStateChange(cb) {
   stateListeners.push(cb);
+}
+
+function getSfxCtx() {
+  if (sfxCtx) return sfxCtx;
+  const AC = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext);
+  if (!AC) return null;
+  try {
+    sfxCtx = new AC();
+  } catch {
+    return null;
+  }
+  return sfxCtx;
+}
+
+function playTone(ctx, frequency, startTime, duration) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = frequency;
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(SFX_VOLUME, startTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.02);
+}
+
+export function playLineClearSfx(lines) {
+  if (userPaused) return;
+  const notes = LINE_CLEAR_NOTES[lines];
+  if (!notes) return;
+  const ctx = getSfxCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  const now = ctx.currentTime;
+  for (const [freq, offset, duration] of notes) {
+    playTone(ctx, freq, now + offset, duration);
+  }
 }
