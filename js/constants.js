@@ -34,6 +34,18 @@ export const DEFAULT_VOLUME = 0.6;
 export const DUCK_VOLUME = 0.2;
 export const STORAGE_KEY_MUTED = 'tetris.music.muted';
 
+// Partículas: quantidade por célula em função das linhas limpas no lock.
+// Single (1) não emite; double/triple/tetris escalam para premiar combos maiores.
+export const PARTICLES_PER_CELL = { 2: 5, 3: 9, 4: 16 };
+export const PARTICLE_GRAVITY = 520;
+export const PARTICLE_MIN_SPEED = 90;
+export const PARTICLE_MAX_SPEED = 320;
+export const PARTICLE_UPWARD_BIAS = 80;
+export const PARTICLE_MIN_LIFE = 0.55;
+export const PARTICLE_MAX_LIFE = 1.05;
+export const PARTICLE_MIN_SIZE = 0.08;
+export const PARTICLE_MAX_SIZE = 0.22;
+
 export const SFX_VOLUME = 0.18;
 // [frequência Hz, offset segundos, duração segundos] — escala C maior, ascendente.
 // 4 linhas (tetris) acrescenta um C6 sustentado para soar triunfante.

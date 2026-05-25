@@ -1,10 +1,14 @@
-import { COLS, ROWS, WALL_KICKS, INITIAL_DROP_INTERVAL } from './constants.js';
+import {
+  COLS, ROWS, WALL_KICKS, INITIAL_DROP_INTERVAL,
+  COLORS, PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
+} from './constants.js';
 import { makePiece, randomPiece, rotate } from './piece.js';
 import { newBoard, collides, merge, clearLines, computeGhostY } from './board.js';
 import { lineScore, levelFromLines, dropIntervalForLevel } from './scoring.js';
 import {
-  drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview,
+  drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview, drawParticles,
 } from './render.js';
+import { createBurst, stepParticles } from './particles.js';
 import {
   dom, ctx, nextCtx, holdCtx, renderStats, showOverlay, hideOverlay, renderMusicState,
 } from './ui.js';
@@ -27,6 +31,8 @@ const state = {
   gameOver: false,
   cell: 30,
   previewCell: 24,
+  particles: [],
+  lastFrame: 0,
 };
 
 function renderBoard() {
@@ -36,6 +42,24 @@ function renderBoard() {
     const ghostY = computeGhostY(state.board, state.current);
     drawGhost(ctx, state.current, ghostY, state.cell);
     drawPiece(ctx, state.current, state.cell);
+  }
+  drawParticles(ctx, state.particles);
+}
+
+function emitLineClearParticles(rows) {
+  const perCell = PARTICLES_PER_CELL[rows.length] || 0;
+  if (!perCell) return;
+  const minSize = state.cell * PARTICLE_MIN_SIZE;
+  const maxSize = state.cell * PARTICLE_MAX_SIZE;
+  for (const { y, cells } of rows) {
+    for (let c = 0; c < cells.length; c++) {
+      const type = cells[c];
+      if (!type) continue;
+      const px = (c + 0.5) * state.cell;
+      const py = (y + 0.5) * state.cell;
+      const burst = createBurst(px, py, COLORS[type], perCell, { minSize, maxSize });
+      for (const p of burst) state.particles.push(p);
+    }
   }
 }
 
@@ -80,6 +104,12 @@ function tryRotate() {
 
 function lockPiece() {
   merge(state.board, state.current);
+  const fullRows = [];
+  for (let r = 0; r < ROWS; r++) {
+    if (state.board[r].every(cell => cell)) {
+      fullRows.push({ y: r, cells: state.board[r].slice() });
+    }
+  }
   const cleared = clearLines(state.board);
   if (cleared > 0) {
     state.score += lineScore(cleared, state.level);
@@ -88,6 +118,7 @@ function lockPiece() {
     state.dropInterval = dropIntervalForLevel(state.level);
     renderStats(state.score, state.lines, state.level);
     audio.playLineClearSfx(cleared);
+    emitLineClearParticles(fullRows);
   }
   if (!state.gameOver) spawn();
 }
@@ -168,8 +199,13 @@ function applyLayout() {
 }
 
 function loop(time) {
-  if (!state.gameOver && !state.paused) {
+  if (state.paused || state.gameOver) {
+    state.lastFrame = 0;
+  } else {
     if (!state.lastDrop) state.lastDrop = time;
+    if (!state.lastFrame) state.lastFrame = time;
+    const dt = Math.min(0.1, (time - state.lastFrame) / 1000);
+    state.lastFrame = time;
     if (time - state.lastDrop > state.dropInterval) {
       if (!collides(state.board, state.current, 0, 1)) {
         state.current.y++;
@@ -178,6 +214,7 @@ function loop(time) {
       }
       state.lastDrop = time;
     }
+    if (state.particles.length) state.particles = stepParticles(state.particles, dt);
     renderBoard();
   }
   requestAnimationFrame(loop);
@@ -190,6 +227,8 @@ function reset() {
   state.level = 1;
   state.dropInterval = INITIAL_DROP_INTERVAL;
   state.lastDrop = 0;
+  state.lastFrame = 0;
+  state.particles = [];
   state.paused = false;
   state.gameOver = false;
   state.hold = null;

@@ -66,6 +66,19 @@ export function drawPiece(ctx, piece, cell) {
   }
 }
 
+export function drawParticles(ctx, particles) {
+  if (!particles.length) return;
+  ctx.save();
+  for (const p of particles) {
+    const alpha = Math.max(0, Math.min(1, p.life / p.maxLife));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    const half = p.size / 2;
+    ctx.fillRect(p.x - half, p.y - half, p.size, p.size);
+  }
+  ctx.restore();
+}
+
 export function drawPiecePreview(ctx, canvasEl, piece, cellSize, dim = false) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
