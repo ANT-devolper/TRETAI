@@ -12,6 +12,7 @@ const KEY_MAP = {
   C: 'hold',
   p: 'pause',
   P: 'pause',
+  Escape: 'pause',
   m: 'toggleMusic',
   M: 'toggleMusic',
 };

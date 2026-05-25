@@ -26,4 +26,27 @@ test.describe('Pausa', () => {
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('#score')).toHaveText('1');
   });
+
+  test('Esc também pausa e retoma o jogo', async ({ page }) => {
+    await page.goto('/');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#overlay')).toHaveClass(/show/);
+    await expect(page.locator('#overlayText')).toHaveText('PAUSADO');
+
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('0');
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#overlay')).not.toHaveClass(/show/);
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('1');
+  });
+
+  test('P e Esc são intercambiáveis para alternar a pausa', async ({ page }) => {
+    await page.goto('/');
+    await page.keyboard.press('p');
+    await expect(page.locator('#overlay')).toHaveClass(/show/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#overlay')).not.toHaveClass(/show/);
+  });
 });

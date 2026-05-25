@@ -77,7 +77,7 @@ TRETAI/
 | ↑ / X       | Rotacionar          |
 | Espaço      | Hard drop           |
 | C           | Hold                |
-| P           | Pausar              |
+| P / Esc     | Pausar              |
 | M           | Música on/off       |
 
 ## Diretrizes de desenvolvimento
