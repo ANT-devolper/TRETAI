@@ -1,10 +1,10 @@
 import {
-  COLS, ROWS, WALL_KICKS, INITIAL_DROP_INTERVAL,
+  COLS, ROWS, WALL_KICKS,
   COLORS, PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
 } from './constants.js';
 import { makePiece, randomPiece, rotate } from './piece.js';
 import { newBoard, collides, merge, clearLines, computeGhostY } from './board.js';
-import { lineScore, levelFromLines, dropIntervalForLevel } from './scoring.js';
+import { lineScore, levelFromScore, dropIntervalForLevel } from './scoring.js';
 import {
   drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview, drawParticles,
 } from './render.js';
@@ -25,7 +25,7 @@ const state = {
   score: 0,
   lines: 0,
   level: 1,
-  dropInterval: INITIAL_DROP_INTERVAL,
+  dropInterval: dropIntervalForLevel(1),
   lastDrop: 0,
   paused: false,
   gameOver: false,
@@ -114,7 +114,7 @@ function lockPiece() {
   if (cleared > 0) {
     state.score += lineScore(cleared, state.level);
     state.lines += cleared;
-    state.level = levelFromLines(state.lines);
+    state.level = levelFromScore(state.score);
     state.dropInterval = dropIntervalForLevel(state.level);
     renderStats(state.score, state.lines, state.level);
     audio.playLineClearSfx(cleared);
@@ -127,6 +127,8 @@ function softDrop() {
   if (!collides(state.board, state.current, 0, 1)) {
     state.current.y++;
     state.score += 1;
+    state.level = levelFromScore(state.score);
+    state.dropInterval = dropIntervalForLevel(state.level);
     renderStats(state.score, state.lines, state.level);
   } else {
     lockPiece();
@@ -140,6 +142,8 @@ function hardDrop() {
     drop++;
   }
   state.score += drop * 2;
+  state.level = levelFromScore(state.score);
+  state.dropInterval = dropIntervalForLevel(state.level);
   renderStats(state.score, state.lines, state.level);
   lockPiece();
 }
@@ -225,7 +229,7 @@ function reset() {
   state.score = 0;
   state.lines = 0;
   state.level = 1;
-  state.dropInterval = INITIAL_DROP_INTERVAL;
+  state.dropInterval = dropIntervalForLevel(1);
   state.lastDrop = 0;
   state.lastFrame = 0;
   state.particles = [];
