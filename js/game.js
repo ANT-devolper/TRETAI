@@ -1,5 +1,5 @@
 import {
-  COLS, ROWS, WALL_KICKS,
+  COLS, ROWS, WALL_KICKS, LOCK_DELAY,
   COLORS, PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
 } from './constants.js';
 import { makePiece, randomPiece, rotate } from './piece.js';
@@ -27,6 +27,7 @@ const state = {
   level: 1,
   dropInterval: dropIntervalForLevel(1),
   lastDrop: 0,
+  lockTimer: 0,
   paused: false,
   gameOver: false,
   cell: 30,
@@ -88,7 +89,10 @@ function spawn(piece) {
 }
 
 function move(dx) {
-  if (!collides(state.board, state.current, dx, 0)) state.current.x += dx;
+  if (!collides(state.board, state.current, dx, 0)) {
+    state.current.x += dx;
+    state.lockTimer = 0;
+  }
 }
 
 function tryRotate() {
@@ -97,12 +101,14 @@ function tryRotate() {
     if (!collides(state.board, state.current, k, 0, rotated)) {
       state.current.shape = rotated;
       state.current.x += k;
+      state.lockTimer = 0;
       return;
     }
   }
 }
 
 function lockPiece() {
+  state.lockTimer = 0;
   merge(state.board, state.current);
   const fullRows = [];
   for (let r = 0; r < ROWS; r++) {
@@ -124,15 +130,12 @@ function lockPiece() {
 }
 
 function softDrop() {
-  if (!collides(state.board, state.current, 0, 1)) {
-    state.current.y++;
-    state.score += 1;
-    state.level = levelFromScore(state.score);
-    state.dropInterval = dropIntervalForLevel(state.level);
-    renderStats(state.score, state.lines, state.level);
-  } else {
-    lockPiece();
-  }
+  if (collides(state.board, state.current, 0, 1)) return;
+  state.current.y++;
+  state.score += 1;
+  state.level = levelFromScore(state.score);
+  state.dropInterval = dropIntervalForLevel(state.level);
+  renderStats(state.score, state.lines, state.level);
 }
 
 function hardDrop() {
@@ -208,15 +211,22 @@ function loop(time) {
   } else {
     if (!state.lastDrop) state.lastDrop = time;
     if (!state.lastFrame) state.lastFrame = time;
-    const dt = Math.min(0.1, (time - state.lastFrame) / 1000);
+    const frameMs = time - state.lastFrame;
+    const dt = Math.min(0.1, frameMs / 1000);
     state.lastFrame = time;
-    if (time - state.lastDrop > state.dropInterval) {
-      if (!collides(state.board, state.current, 0, 1)) {
-        state.current.y++;
-      } else {
+    const grounded = collides(state.board, state.current, 0, 1);
+    if (grounded) {
+      state.lockTimer += frameMs;
+      if (state.lockTimer >= LOCK_DELAY) {
         lockPiece();
+        state.lastDrop = time;
       }
-      state.lastDrop = time;
+    } else {
+      state.lockTimer = 0;
+      if (time - state.lastDrop > state.dropInterval) {
+        state.current.y++;
+        state.lastDrop = time;
+      }
     }
     if (state.particles.length) state.particles = stepParticles(state.particles, dt);
     renderBoard();
@@ -231,6 +241,7 @@ function reset() {
   state.level = 1;
   state.dropInterval = dropIntervalForLevel(1);
   state.lastDrop = 0;
+  state.lockTimer = 0;
   state.lastFrame = 0;
   state.particles = [];
   state.paused = false;

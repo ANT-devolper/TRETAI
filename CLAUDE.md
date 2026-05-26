@@ -59,6 +59,7 @@ TRETAI/
 ## Features
 
 - Classic Tetris: 7 tetrominoes, rotation with wall kicks, ghost piece, hold, soft/hard drop.
+- 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
 - Score, line count, level (speeds up `dropInterval`).
 - Pause and game over overlay with "Play again" button.
 - **No-scroll** layout (vertical/horizontal locked), adaptive to any viewport — `CELL` recomputed on `resize`.
@@ -185,3 +186,4 @@ No build step, no custom workflow, no `vercel.json` — the site is served as-is
 6. Test infrastructure: `node --test` for unit (43 cases), Playwright for E2E (~20 specs), zero-dep static server in `scripts/serve.js`.
 7. Music coupled to game state: `P`/`Esc` actually pause the stream (previously they only lowered the volume); mute via `M` became per-session (no `localStorage`) to avoid blocking autoplay on future reloads. Smoke spec switched to `getByRole('heading')` instead of `text=` for more robust asserts.
 8. Documentation and tests fully translated to English; rule 27 dropped the PT-BR exception.
+9. Lock delay: pieces grounded by gravity wait 500 ms before locking, with the timer resetting on each successful move/rotation so high-level play stays controllable. Soft drop on a grounded piece is now a no-op (hard drop still locks instantly).
