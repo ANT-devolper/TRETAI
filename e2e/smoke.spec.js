@@ -11,10 +11,10 @@ test.describe('Smoke', () => {
 
   test('painel exibe boxes principais', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('text=Pontuação')).toBeVisible();
-    await expect(page.locator('text=Linhas')).toBeVisible();
-    await expect(page.locator('text=Nível')).toBeVisible();
-    await expect(page.locator('text=Música')).toBeVisible();
-    await expect(page.locator('text=Controles')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pontuação' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Linhas' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nível' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Música' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Controles' })).toBeVisible();
   });
 });
