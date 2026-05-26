@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Pausa', () => {
-  test('P exibe overlay PAUSADO e bloqueia inputs', async ({ page }) => {
+test.describe('Pause', () => {
+  test('P shows the PAUSADO overlay and blocks inputs', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('p');
     await expect(page.locator('#overlay')).toHaveClass(/show/);
@@ -11,7 +11,7 @@ test.describe('Pausa', () => {
     await expect(page.locator('#score')).toHaveText('0');
   });
 
-  test('P alterna pausa de volta', async ({ page }) => {
+  test('P toggles pause back off', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('p');
     await expect(page.locator('#overlay')).toHaveClass(/show/);
@@ -19,7 +19,7 @@ test.describe('Pausa', () => {
     await expect(page.locator('#overlay')).not.toHaveClass(/show/);
   });
 
-  test('soft drop volta a funcionar após retomar', async ({ page }) => {
+  test('soft drop works again after resuming', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('p');
     await page.keyboard.press('p');
@@ -27,7 +27,7 @@ test.describe('Pausa', () => {
     await expect(page.locator('#score')).toHaveText('1');
   });
 
-  test('Esc também pausa e retoma o jogo', async ({ page }) => {
+  test('Esc also pauses and resumes the game', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('Escape');
     await expect(page.locator('#overlay')).toHaveClass(/show/);
@@ -42,7 +42,7 @@ test.describe('Pausa', () => {
     await expect(page.locator('#score')).toHaveText('1');
   });
 
-  test('P e Esc são intercambiáveis para alternar a pausa', async ({ page }) => {
+  test('P and Esc are interchangeable for toggling pause', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('p');
     await expect(page.locator('#overlay')).toHaveClass(/show/);

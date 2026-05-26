@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Smoke', () => {
-  test('página carrega com canvas e contadores zerados', async ({ page }) => {
+  test('page loads with canvas and zeroed counters', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#board')).toBeVisible();
     await expect(page.locator('#score')).toHaveText('0');
@@ -9,7 +9,7 @@ test.describe('Smoke', () => {
     await expect(page.locator('#level')).toHaveText('1');
   });
 
-  test('painel exibe boxes principais', async ({ page }) => {
+  test('panel renders the main boxes', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Pontuação' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Linhas' })).toBeVisible();

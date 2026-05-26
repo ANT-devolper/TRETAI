@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { mockAudio } from './audio-mock.js';
 
-test.describe('Persistência', () => {
-  test('mute via M não persiste após reload', async ({ page }) => {
+test.describe('Persistence', () => {
+  test('mute via M does not persist across reload', async ({ page }) => {
     await mockAudio(page);
     await page.goto('/');
 

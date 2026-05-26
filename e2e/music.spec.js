@@ -1,30 +1,30 @@
 import { test, expect } from '@playwright/test';
 import { mockAudio } from './audio-mock.js';
 
-test.describe('Música', () => {
+test.describe('Music', () => {
   test.beforeEach(async ({ page }) => {
     await mockAudio(page);
     await page.goto('/');
   });
 
-  test('botão inicia em estado paused', async ({ page }) => {
+  test('button starts in the paused state', async ({ page }) => {
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'paused');
     await expect(page.locator('#musicBtn')).toHaveText(/Tocar/);
   });
 
-  test('clique no botão alterna para playing', async ({ page }) => {
+  test('clicking the button toggles to playing', async ({ page }) => {
     await page.locator('#musicBtn').click();
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'playing');
     await expect(page.locator('#musicBtn')).toHaveText(/Pausar/);
   });
 
-  test('clique alterna de volta para paused', async ({ page }) => {
+  test('clicking toggles back to paused', async ({ page }) => {
     await page.locator('#musicBtn').click();
     await page.locator('#musicBtn').click();
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'paused');
   });
 
-  test('tecla M alterna música', async ({ page }) => {
+  test('M key toggles music', async ({ page }) => {
     await page.locator('#board').focus();
     await page.keyboard.press('m');
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'playing');
@@ -32,7 +32,7 @@ test.describe('Música', () => {
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'paused');
   });
 
-  test('primeira tecla não-M arma o áudio automaticamente', async ({ page }) => {
+  test('first non-M key arms audio automatically', async ({ page }) => {
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'playing');
   });

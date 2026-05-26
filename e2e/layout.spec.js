@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Layout', () => {
-  test('página não tem rolagem vertical', async ({ page }) => {
+  test('page has no vertical scroll', async ({ page }) => {
     await page.goto('/');
     const overflow = await page.evaluate(() => ({
       scrollH: document.documentElement.scrollHeight,
@@ -13,7 +13,7 @@ test.describe('Layout', () => {
     expect(overflow.scrollW).toBeLessThanOrEqual(overflow.clientW);
   });
 
-  test('canvas redimensiona quando o viewport muda', async ({ page }) => {
+  test('canvas resizes when the viewport changes', async ({ page }) => {
     await page.goto('/');
     await page.setViewportSize({ width: 800, height: 600 });
     const w1 = Number(await page.locator('#board').getAttribute('width'));
@@ -24,7 +24,7 @@ test.describe('Layout', () => {
     ).toBeGreaterThan(w1);
   });
 
-  test('setas não causam rolagem da página', async ({ page }) => {
+  test('arrow keys do not cause page scroll', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowDown');
