@@ -168,10 +168,10 @@ function togglePause() {
   state.paused = !state.paused;
   if (state.paused) {
     showOverlay('PAUSADO');
-    audio.duck(true);
+    audio.pauseForGame();
   } else {
     hideOverlay();
-    audio.duck(false);
+    audio.resumeForGame();
     state.lastDrop = 0;
   }
 }

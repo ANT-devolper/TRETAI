@@ -70,6 +70,16 @@ export function duck(on) {
   audioEl.volume = on ? DUCK_VOLUME : DEFAULT_VOLUME;
 }
 
+export function pauseForGame() {
+  if (!audioEl) return;
+  audioEl.pause();
+}
+
+export function resumeForGame() {
+  if (!audioEl || userPaused) return;
+  tryPlay();
+}
+
 export function armOnFirstGesture() {
   if (armed || !audioEl) return;
   armed = true;
