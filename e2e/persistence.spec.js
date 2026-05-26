@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mockAudio } from './audio-mock.js';
 
 test.describe('Persistência', () => {
-  test('preferência de mute persiste após reload', async ({ page }) => {
+  test('mute via M não persiste após reload', async ({ page }) => {
     await mockAudio(page);
     await page.goto('/');
 
@@ -11,11 +11,8 @@ test.describe('Persistência', () => {
     await page.locator('#musicBtn').click();
     await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'paused');
 
-    const stored = await page.evaluate(() => localStorage.getItem('tetris.music.muted'));
-    expect(stored).toBe('1');
-
     await page.reload();
     await page.keyboard.press('ArrowLeft');
-    await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'paused');
+    await expect(page.locator('#musicBtn')).toHaveAttribute('data-state', 'playing');
   });
 });

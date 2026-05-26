@@ -31,7 +31,6 @@ export const SCROLL_KEYS = [
 export const STREAM_URL = 'https://ice1.somafm.com/groovesalad-128-mp3';
 export const DEFAULT_VOLUME = 0.6;
 export const DUCK_VOLUME = 0.2;
-export const STORAGE_KEY_MUTED = 'tetris.music.muted';
 
 // Partículas: quantidade por célula em função das linhas limpas no lock.
 // Single (1) não emite; double/triple/tetris escalam para premiar combos maiores.

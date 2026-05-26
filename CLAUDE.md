@@ -64,9 +64,10 @@ TRETAI/
 - Layout **sem rolagem** (vertical/horizontal travadas) e adaptativo a qualquer viewport — `CELL` recalculado em `resize`.
 - Música lofi ambiente via stream SomaFM Groove Salad com:
   - Botão play/pause no painel + atalho `M`.
-  - Volume reduzido (duck) em pausa/game over.
-  - Preferência mute persistida em `localStorage`.
+  - Pausa do jogo (`P`/`Esc`) também pausa o stream; retomar volta a tocar.
+  - Volume reduzido (duck) em game over.
   - Armada após primeira interação por causa da autoplay policy.
+  - Mute via `M` vale só pra sessão atual; reload sempre começa armado.
 
 ### Controles
 
