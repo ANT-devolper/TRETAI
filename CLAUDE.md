@@ -6,7 +6,7 @@ Jogo de Tetris em vanilla JavaScript, modular via ES Modules, servido como site 
 
 - HTML5, CSS3, JavaScript ES Modules — sem framework, sem bundler.
 - Canvas 2D para renderização do tabuleiro e previews.
-- Deploy estático na Vercel (raiz do repo).
+- Deploy estático no GithubPages(raiz do repo).
 - Tooling de teste em `devDependencies` (não afeta runtime/deploy):
   - `node --test` nativo para unit tests (zero dep)
   - Playwright para E2E
@@ -107,27 +107,28 @@ TRETAI/
 
 ### Deploy
 
-14. **Vercel direto da raiz.** Sem build command, sem `vercel.json`.
+14. **Github Pages direto da raiz.** Sem build command
 15. **ES Modules exigem HTTP/HTTPS.** Em dev local, usar Live Server ou `python3 -m http.server`. Nunca abrir via `file://`.
 16. **Caminhos relativos.** `./constants.js`, `js/main.js`, `style.css` — funcionam em qualquer host (raiz ou subpath).
 
-### Commits
+### Commits, PRs e documentação
 
-17. **Conventional Commits em português.** Tipos: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `test`.
-18. **Mensagem inclui motivação.** Corpo do commit explica o "porquê" da mudança, não apenas o "o quê".
-19. **Co-autoria preservada.** `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>` quando aplicável.
+17. **Tudo em inglês.** Mensagens de commit, títulos e descrições de PR, README, CLAUDE.md, comentários de código e qualquer outra documentação são escritos em inglês. Exceção: nomes de testes seguem a regra 25 (PT-BR).
+18. **Conventional Commits.** Tipos: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `test`.
+19. **Mensagem inclui motivação.** Corpo do commit explica o "porquê" da mudança, não apenas o "o quê".
+20. **Não aplicar Co-autoria.** `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>` não aplicar.
 
 ### Testes
 
-20. **Toda função pura precisa de teste unitário.** Novos comportamentos em `piece.js`, `board.js`, `scoring.js`, `resize.js` exigem caso correspondente em `tests/`.
-21. **DOM, áudio e integração → E2E.** Não tentar emular DOM no Node; usar Playwright em `e2e/` para fluxos reais.
-22. **Testar comportamento, não implementação.** Asserções sobre entrada→saída ou estado observável (DOM, `localStorage`); nunca sobre detalhes internos do módulo.
-23. **Refatorar pra testabilidade quando útil.** Se uma função pura ficar presa atrás de side effects, extrair a parte pura aceitando parâmetros (ex.: `computeLayout(vw, vh)`).
-24. **Mocks no nível certo.** Mockar `Math.random`, `Date.now`, `localStorage`, `window.Audio` quando necessário; não mockar o módulo sob teste.
-25. **Testes em PT-BR**, alinhados com o resto do projeto. Nomes descrevem o caso, não o "deve" genérico.
-26. **Rodar `npm test` antes de commits que mexem em módulo puro; `npm run test:e2e` antes de PRs significativos.**
-27. **Runtime continua zero-dep.** Tooling de teste mora exclusivamente em `devDependencies`. Vercel ignora.
-28. **`node_modules/`, `playwright-report/`, `test-results/` ficam no `.gitignore`.**
+21. **Toda função pura precisa de teste unitário.** Novos comportamentos em `piece.js`, `board.js`, `scoring.js`, `resize.js` exigem caso correspondente em `tests/`.
+22. **DOM, áudio e integração → E2E.** Não tentar emular DOM no Node; usar Playwright em `e2e/` para fluxos reais.
+23. **Testar comportamento, não implementação.** Asserções sobre entrada→saída ou estado observável (DOM, `localStorage`); nunca sobre detalhes internos do módulo.
+24. **Refatorar pra testabilidade quando útil.** Se uma função pura ficar presa atrás de side effects, extrair a parte pura aceitando parâmetros (ex.: `computeLayout(vw, vh)`).
+25. **Mocks no nível certo.** Mockar `Math.random`, `Date.now`, `localStorage`, `window.Audio` quando necessário; não mockar o módulo sob teste.
+26. **Testes em PT-BR**, alinhados com o histórico do projeto. Nomes descrevem o caso, não o "deve" genérico.
+27. **Rodar `npm test` antes de commits que mexem em módulo puro; `npm run test:e2e` antes de PRs significativos.**
+28. **Runtime continua zero-dep.** Tooling de teste mora exclusivamente em `devDependencies`. GitHub Pages ignora.
+29. **`node_modules/`, `playwright-report/`, `test-results/` ficam no `.gitignore`.**
 
 ## Como rodar localmente
 
@@ -163,13 +164,15 @@ O webServer do Playwright sobe automaticamente o `scripts/serve.js` antes dos te
 
 ## Como fazer deploy
 
-```bash
-# CLI
-vercel
+Deploy automático via **GitHub Pages** servindo a raiz do `main`. Cada `git push` para o `main` publica.
 
-# ou via dashboard: importar github.com/ANT-devolper/TRETAI
-# detectado como "Other" (estático), sem configuração
-```
+Configuração no GitHub:
+
+1. Repositório → **Settings** → **Pages**.
+2. **Source**: `Deploy from a branch`.
+3. **Branch**: `main` / `/ (root)` → **Save**.
+
+Sem build step, sem workflow customizado, sem `vercel.json` — o site é servido como está na raiz.
 
 ## Histórico do projeto
 
@@ -179,3 +182,4 @@ vercel
 4. Modularização em ES Modules sob `js/` por responsabilidade.
 5. Música lofi ambiente via SomaFM com duck no pause/game over.
 6. Infraestrutura de testes: `node --test` para unit (43 casos), Playwright para E2E (~20 specs), server estático zero-dep em `scripts/serve.js`.
+7. Música acoplada ao estado do jogo: `P`/`Esc` pausam o stream de verdade (antes só baixavam o volume); mute via `M` virou per-session (sem `localStorage`) para não bloquear o autoplay em reloads futuros. Smoke spec passou a usar `getByRole('heading')` no lugar de `text=` para asserts mais robustos.
