@@ -1,4 +1,4 @@
-import { COLORS, COLS, ROWS } from './constants.js';
+import { COLORS, COLS, ROWS, TRAIL_ALPHA_START } from './constants.js';
 
 export function drawCell(ctx, type, x, y, size) {
   ctx.fillStyle = COLORS[type];
@@ -64,6 +64,18 @@ export function drawPiece(ctx, piece, cell) {
       }
     }
   }
+}
+
+export function drawTrails(ctx, trails) {
+  if (!trails.length) return;
+  ctx.save();
+  for (const t of trails) {
+    const fade = Math.max(0, Math.min(1, t.life / t.maxLife));
+    ctx.globalAlpha = fade * TRAIL_ALPHA_START;
+    ctx.fillStyle = t.color;
+    ctx.fillRect(t.x, t.y, t.width, t.height);
+  }
+  ctx.restore();
 }
 
 export function drawParticles(ctx, particles) {

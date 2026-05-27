@@ -6,9 +6,10 @@ import { makePiece, randomPiece, rotate } from './piece.js';
 import { newBoard, collides, merge, clearLines, computeGhostY } from './board.js';
 import { lineScore, levelFromScore, dropIntervalForLevel } from './scoring.js';
 import {
-  drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview, drawParticles,
+  drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview, drawParticles, drawTrails,
 } from './render.js';
 import { createBurst, stepParticles } from './particles.js';
+import { createDropTrail, stepTrails } from './trails.js';
 import {
   dom, ctx, nextCtx, holdCtx, renderStats, showOverlay, hideOverlay, renderMusicState,
 } from './ui.js';
@@ -33,12 +34,14 @@ const state = {
   cell: 30,
   previewCell: 24,
   particles: [],
+  trails: [],
   lastFrame: 0,
 };
 
 function renderBoard() {
   drawGrid(ctx, dom.canvas, state.cell);
   drawLockedCells(ctx, state.board, state.cell);
+  drawTrails(ctx, state.trails);
   if (state.current && !state.gameOver) {
     const ghostY = computeGhostY(state.board, state.current);
     drawGhost(ctx, state.current, ghostY, state.cell);
@@ -139,11 +142,16 @@ function softDrop() {
 }
 
 function hardDrop() {
+  const startY = state.current.y;
   let drop = 0;
   while (!collides(state.board, state.current, 0, 1)) {
     state.current.y++;
     drop++;
   }
+  const trail = createDropTrail(
+    state.current, startY, state.current.y, state.cell, COLORS[state.current.type],
+  );
+  for (const t of trail) state.trails.push(t);
   state.score += drop * 2;
   state.level = levelFromScore(state.score);
   state.dropInterval = dropIntervalForLevel(state.level);
@@ -229,6 +237,7 @@ function loop(time) {
       }
     }
     if (state.particles.length) state.particles = stepParticles(state.particles, dt);
+    if (state.trails.length) state.trails = stepTrails(state.trails, dt);
     renderBoard();
   }
   requestAnimationFrame(loop);
@@ -244,6 +253,7 @@ function reset() {
   state.lockTimer = 0;
   state.lastFrame = 0;
   state.particles = [];
+  state.trails = [];
   state.paused = false;
   state.gameOver = false;
   state.hold = null;

@@ -46,6 +46,9 @@ export const PARTICLE_MAX_LIFE = 1.05;
 export const PARTICLE_MIN_SIZE = 0.08;
 export const PARTICLE_MAX_SIZE = 0.22;
 
+export const TRAIL_DURATION = 0.375;
+export const TRAIL_ALPHA_START = 0.55;
+
 export const SFX_VOLUME = 0.18;
 // [frequência Hz, offset segundos, duração segundos] — escala C maior, ascendente.
 // 4 linhas (tetris) acrescenta um C6 sustentado para soar triunfante.
