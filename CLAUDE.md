@@ -33,12 +33,16 @@ TRETAI/
 │   ├── resize.js           # pure computeLayout(vw, vh); default reads from document
 │   ├── input.js            # bindKeyboard with declarative KEY_MAP
 │   ├── audio.js            # init, toggle, duck, armOnFirstGesture, onStateChange
+│   ├── particles.js        # createBurst, stepParticles (pure) — line-clear effect
+│   ├── trails.js           # createDropTrail, stepTrails (pure) — hard-drop trail effect
 │   └── game.js             # orchestrator: mutable state + loop + wiring
 ├── tests/                  # unit (node --test)
 │   ├── piece.test.js
 │   ├── board.test.js
 │   ├── scoring.test.js
-│   └── resize.test.js
+│   ├── resize.test.js
+│   ├── particles.test.js
+│   └── trails.test.js
 └── e2e/                    # Playwright
     ├── audio-mock.js       # helper: replaces window.Audio with MockAudio
     ├── smoke.spec.js
@@ -46,12 +50,13 @@ TRETAI/
     ├── pause.spec.js
     ├── music.spec.js
     ├── persistence.spec.js
-    └── layout.spec.js
+    ├── layout.spec.js
+    └── hard-drop-trail.spec.js
 ```
 
 ### Layers
 
-- **Pure** (no state, no DOM): `piece.js`, `board.js`, `scoring.js`, `render.js`, `resize.js`.
+- **Pure** (no state, no DOM): `piece.js`, `board.js`, `scoring.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`.
 - **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners).
 - **Orchestration**: `game.js` is the only module with mutable game state. `audio.js` keeps its own encapsulated state.
 - **Bootstrap**: `main.js`.
@@ -60,6 +65,7 @@ TRETAI/
 
 - Classic Tetris: 7 tetrominoes, rotation with wall kicks, ghost piece, hold, soft/hard drop.
 - 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
+- Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
 - Score, line count, level (speeds up `dropInterval`).
 - Pause and game over overlay with "Play again" button.
 - **No-scroll** layout (vertical/horizontal locked), adaptive to any viewport — `CELL` recomputed on `resize`.
@@ -187,3 +193,4 @@ No build step, no custom workflow, no `vercel.json` — the site is served as-is
 7. Music coupled to game state: `P`/`Esc` actually pause the stream (previously they only lowered the volume); mute via `M` became per-session (no `localStorage`) to avoid blocking autoplay on future reloads. Smoke spec switched to `getByRole('heading')` instead of `text=` for more robust asserts.
 8. Documentation and tests fully translated to English; rule 27 dropped the PT-BR exception.
 9. Lock delay: pieces grounded by gravity wait 500 ms before locking, with the timer resetting on each successful move/rotation so high-level play stays controllable. Soft drop on a grounded piece is now a no-op (hard drop still locks instantly).
+10. Hard drop visual trail: pressing Space now leaves a quick fading rectangle per occupied cell, drawn in the piece color with a translucent white wash layered on top. Extracted as a pure module (`js/trails.js`) mirroring the particles pipeline (`createDropTrail`/`stepTrails`), wired through `state.trails` in `game.js`, rendered by `drawTrails` in `render.js`, and tuned via `TRAIL_DURATION` (0.2 s), `TRAIL_ALPHA_START` (0.3), and `TRAIL_WHITE_ALPHA` (0.2) in `constants.js`. Covered by unit tests in `tests/trails.test.js` and an E2E pixel-sampling check in `e2e/hard-drop-trail.spec.js`.

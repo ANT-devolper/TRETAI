@@ -5,3 +5,6 @@ test-results/
 coverage/
 .DS_Store
 .vscode/
+.claude/
+.ai-jail
+package-lock.json
