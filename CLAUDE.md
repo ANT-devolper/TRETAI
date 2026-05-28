@@ -138,6 +138,8 @@ TRETAI/
 28. **Run `npm test` before commits that touch a pure module; `npm run test:e2e` before significant PRs.**
 29. **Runtime stays zero-dep.** Test tooling lives exclusively in `devDependencies`. GitHub Pages ignores it.
 30. **`node_modules/`, `playwright-report/`, `test-results/` are in `.gitignore`.**
+31. **Red→green for new features.** Write the failing test BEFORE the implementation, in the right layer (unit for pure code, E2E for DOM/integration). Run it and confirm it fails for the expected reason, then write the minimum code to turn it green. If for some reason a test is added after the code is already green, demonstrate it catches regressions by temporarily reverting the relevant impl and showing the test goes red — a test that has never been observed failing proves nothing.
+32. **Force determinism in E2E.** When a test needs a specific game state (game over, line clear, level transition), inject determinism via `page.addInitScript` — override `Math.random`, seed `localStorage`, or mock `window.Audio` — and then drive the input loop. Don't rely on random piece sequences to "eventually" reach the state. Example: `e2e/highscore-gameover.spec.js` fixes `Math.random = () => 0` so 25 hard drops deterministically game-over the board.
 
 ## How to run locally
 
