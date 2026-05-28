@@ -16,6 +16,7 @@ Tetris game in vanilla JavaScript, modular via ES Modules, served as a static si
 ```
 TRETAI/
 ├── index.html              # markup + <link style.css> + <script type="module" src="js/main.js">
+├── favicon.svg             # SVG favicon (purple T tetromino)
 ├── style.css               # all styles (no inline)
 ├── CLAUDE.md
 ├── package.json            # devDeps only (Playwright)
