@@ -127,6 +127,26 @@ canvas {
   display: flex;
 }
 
+.overlay-detail {
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #0ff;
+  text-align: center;
+  white-space: pre-line;
+  display: none;
+}
+
+.overlay-detail.show {
+  display: block;
+  animation: pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { text-shadow: 0 0 4px rgba(0, 255, 255, 0.4); }
+  to   { text-shadow: 0 0 12px rgba(0, 255, 255, 0.9); }
+}
+
 .overlay button {
   margin-top: 16px;
   padding: 10px 24px;

@@ -5,8 +5,10 @@ export const dom = {
   scoreEl: document.getElementById('score'),
   linesEl: document.getElementById('lines'),
   levelEl: document.getElementById('level'),
+  bestEl: document.getElementById('best'),
   overlay: document.getElementById('overlay'),
   overlayText: document.getElementById('overlayText'),
+  overlayDetail: document.getElementById('overlayDetail'),
   restartBtn: document.getElementById('restartBtn'),
   panel: document.querySelector('.panel'),
   musicBtn: document.getElementById('musicBtn'),
@@ -22,15 +24,28 @@ export function renderStats(score, lines, level) {
   dom.levelEl.textContent = level;
 }
 
-export function showOverlay(text, withRestart = false) {
+export function renderBest(best) {
+  dom.bestEl.textContent = best;
+}
+
+export function showOverlay(text, withRestart = false, detail = null) {
   dom.overlayText.textContent = text;
   dom.overlay.classList.add('show');
   dom.restartBtn.classList.toggle('show', withRestart);
+  if (detail) {
+    dom.overlayDetail.textContent = detail;
+    dom.overlayDetail.classList.add('show');
+  } else {
+    dom.overlayDetail.textContent = '';
+    dom.overlayDetail.classList.remove('show');
+  }
 }
 
 export function hideOverlay() {
   dom.overlay.classList.remove('show');
   dom.restartBtn.classList.remove('show');
+  dom.overlayDetail.textContent = '';
+  dom.overlayDetail.classList.remove('show');
 }
 
 export function renderMusicState({ playing }) {

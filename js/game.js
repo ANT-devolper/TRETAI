@@ -11,11 +11,12 @@ import {
 import { createBurst, stepParticles } from './particles.js';
 import { createDropTrail, stepTrails } from './trails.js';
 import {
-  dom, ctx, nextCtx, holdCtx, renderStats, showOverlay, hideOverlay, renderMusicState,
+  dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
 } from './ui.js';
 import { computeLayout } from './resize.js';
 import { bindKeyboard } from './input.js';
 import * as audio from './audio.js';
+import * as highscore from './highscore.js';
 
 const state = {
   board: null,
@@ -26,6 +27,7 @@ const state = {
   score: 0,
   lines: 0,
   level: 1,
+  best: 0,
   dropInterval: dropIntervalForLevel(1),
   lastDrop: 0,
   lockTimer: 0,
@@ -86,7 +88,15 @@ function spawn(piece) {
   state.canHold = true;
   if (collides(state.board, state.current)) {
     state.gameOver = true;
-    showOverlay('FIM DE JOGO', true);
+    const previousBest = state.best;
+    let detail = null;
+    if (highscore.isNew(state.score, previousBest)) {
+      highscore.write(state.score);
+      state.best = state.score;
+      renderBest(state.best);
+      detail = `NOVO RECORDE!\n${state.score}\n(antes: ${previousBest})`;
+    }
+    showOverlay('FIM DE JOGO', true, detail);
     audio.duck(true);
   }
 }
@@ -262,12 +272,14 @@ function reset() {
   spawn();
   renderHold();
   renderStats(state.score, state.lines, state.level);
+  renderBest(state.best);
   hideOverlay();
   audio.duck(false);
 }
 
 export function start() {
   applyLayout();
+  state.best = highscore.read();
   reset();
   bindKeyboard({
     left: withTurn(() => move(-1)),
