@@ -26,7 +26,8 @@ TRETAI/
 ├── js/
 │   ├── main.js             # entry point (init audio, start game)
 │   ├── constants.js        # COLS, ROWS, COLORS, SHAPES, scoring, audio, shortcuts
-│   ├── piece.js            # makePiece, randomPiece, rotate (pure)
+│   ├── piece.js            # makePiece, rotate (pure)
+│   ├── bag.js              # shuffleBag, newBag, nextType — 7-bag randomizer (pure)
 │   ├── board.js            # newBoard, collides, merge, clearLines, computeGhostY (pure)
 │   ├── scoring.js          # lineScore, levelFromLines, dropIntervalForLevel (pure)
 │   ├── render.js           # canvas drawing primitives (pure, take ctx + data)
@@ -39,6 +40,7 @@ TRETAI/
 │   └── game.js             # orchestrator: mutable state + loop + wiring
 ├── tests/                  # unit (node --test)
 │   ├── piece.test.js
+│   ├── bag.test.js
 │   ├── board.test.js
 │   ├── scoring.test.js
 │   ├── resize.test.js
@@ -57,7 +59,7 @@ TRETAI/
 
 ### Layers
 
-- **Pure** (no state, no DOM): `piece.js`, `board.js`, `scoring.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`.
+- **Pure** (no state, no DOM): `piece.js`, `bag.js`, `board.js`, `scoring.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`.
 - **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners).
 - **Orchestration**: `game.js` is the only module with mutable game state. `audio.js` keeps its own encapsulated state.
 - **Bootstrap**: `main.js`.
@@ -65,6 +67,7 @@ TRETAI/
 ## Features
 
 - Classic Tetris: 7 tetrominoes, rotation with wall kicks, ghost piece, hold, soft/hard drop.
+- **7-bag randomizer**: pieces are dealt from a shuffled bag of all 7 types, refilled when empty, so every window of 7 pieces contains exactly one of each — no droughts, no long repeats.
 - 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
 - Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
 - Score, line count, level (speeds up `dropInterval`).
@@ -139,7 +142,7 @@ TRETAI/
 29. **Runtime stays zero-dep.** Test tooling lives exclusively in `devDependencies`. GitHub Pages ignores it.
 30. **`node_modules/`, `playwright-report/`, `test-results/` are in `.gitignore`.**
 31. **Red→green for new features.** Write the failing test BEFORE the implementation, in the right layer (unit for pure code, E2E for DOM/integration). Run it and confirm it fails for the expected reason, then write the minimum code to turn it green. If for some reason a test is added after the code is already green, demonstrate it catches regressions by temporarily reverting the relevant impl and showing the test goes red — a test that has never been observed failing proves nothing.
-32. **Force determinism in E2E.** When a test needs a specific game state (game over, line clear, level transition), inject determinism via `page.addInitScript` — override `Math.random`, seed `localStorage`, or mock `window.Audio` — and then drive the input loop. Don't rely on random piece sequences to "eventually" reach the state. Example: `e2e/highscore-gameover.spec.js` fixes `Math.random = () => 0` so 25 hard drops deterministically game-over the board.
+32. **Force determinism in E2E.** When a test needs a specific game state (game over, line clear, level transition), inject determinism via `page.addInitScript` — override `Math.random`, seed `localStorage`, or mock `window.Audio` — and then drive the input loop. Don't rely on random piece sequences to "eventually" reach the state. Example: `e2e/highscore-gameover.spec.js` fixes `Math.random = () => 0` so a fixed 7-bag order and a generous run of hard drops deterministically game-over the board.
 
 ## How to run locally
 
@@ -199,3 +202,4 @@ No build step, no custom workflow, no `vercel.json` — the site is served as-is
 10. Hard drop visual trail: pressing Space now leaves a quick fading rectangle per occupied cell, drawn in the piece color with a translucent white wash layered on top. Extracted as a pure module (`js/trails.js`) mirroring the particles pipeline (`createDropTrail`/`stepTrails`), wired through `state.trails` in `game.js`, rendered by `drawTrails` in `render.js`, and tuned via `TRAIL_DURATION` (0.2 s), `TRAIL_ALPHA_START` (0.3), and `TRAIL_WHITE_ALPHA` (0.2) in `constants.js`. Covered by unit tests in `tests/trails.test.js` and an E2E pixel-sampling check in `e2e/hard-drop-trail.spec.js`.
 11. Browser tab identity: added `favicon.svg` at the repo root — a flat T tetromino in the in-game purple (`#a000f0`, same as `COLORS.T`) drawn as four `<rect>`s on a 32×32 viewBox. Linked from `index.html` via `<link rel="icon" type="image/svg+xml">` and paired with `<meta name="theme-color" content="#a000f0">` so the mobile/PWA URL bar picks up the accent. SVG keeps the runtime zero-dep and scales crisp at any DPI; no PNG/ICO variants.
 12. High score persisted across sessions: pulled into its own isolated module (`js/highscore.js`) mirroring the `audio.js` pattern — `localStorage` reads/writes wrapped in `try/catch` so private mode never breaks the app, plus a pure `isNew(score, previous)` predicate for unit tests. A new "Recorde" box in the panel shows the current best (loaded on `start()` into `state.best`); on game over `spawn()` checks `isNew`, writes the new value, refreshes the panel, and feeds a celebration string ("NOVO RECORDE!" + current + previous) into `showOverlay`. `showOverlay` gained an optional `detail` argument plus a `.overlay-detail` block styled with a cyan glow pulse. Storage key lives in `constants.js` as `HIGH_SCORE_KEY`. Covered by unit tests in `tests/highscore.test.js` (16 cases including localStorage failures) and end-to-end specs in `e2e/highscore.spec.js` + `e2e/highscore-gameover.spec.js`, the latter forcing a deterministic stack by overriding `Math.random` so the new-record / no-record / restart branches are all exercised.
+13. 7-bag randomizer replaces the uniform `randomPiece()`: pieces are now dealt from a shuffled bag of all 7 tetrominoes, refilled and reshuffled when empty, guaranteeing every window of 7 pieces contains exactly one of each (no droughts, no long repeats). Extracted as a pure module (`js/bag.js`) with `shuffleBag` (Fisher-Yates, RNG injectable), `newBag`, and `nextType(bag, rng) → { type, bag }`. The bag lives as `state.bag` in `game.js`, threaded through a `pullPiece()` helper that replaced the three `randomPiece()` call sites in `spawn()`/`reset()`; `reset()` clears the bag so each game starts fresh. `randomPiece()` and its tests were removed. Covered by unit tests in `tests/bag.test.js` (9 cases, including the 7-pull and 14-pull window guarantees across the refill seam). `e2e/highscore-gameover.spec.js` was updated: under 7-bag, `Math.random=0` yields the fixed order `[O,T,S,Z,J,L,I]`, so the spec now drops ~60 pieces straight down (central columns never complete a line, so the stack tops out deterministically).

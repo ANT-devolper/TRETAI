@@ -8,19 +8,21 @@ async function setup(page, { record = 0 } = {}) {
       if (rec > 0) localStorage.setItem('tretai.highScore', String(rec));
       else localStorage.removeItem('tretai.highScore');
     } catch {}
-    // Force a deterministic piece stream (always I-piece) so we can reach
-    // game over via a known number of hard drops.
+    // Force a deterministic piece stream so we can reliably reach game over.
+    // With the 7-bag generator, Math.random=0 yields the fixed bag order
+    // [O,T,S,Z,J,L,I], repeating — varied but fully deterministic.
     Math.random = () => 0;
   }, record);
   await page.goto('/');
 }
 
 async function stackUntilGameOver(page) {
-  // I-piece is the first key in SHAPES. With Math.random=0, every spawn is I.
-  // Hard-dropping straight from spawn fills board columns 3..6 from row 19 up.
-  // After 19 locks, row 1 is filled; piece 20's spawn collides → game over.
-  // 25 presses leaves margin; presses after game over are no-ops (withTurn).
-  for (let i = 0; i < 25; i++) {
+  // Hard-dropping every piece straight from spawn (no lateral moves) piles them
+  // up the central columns. Those columns never complete a 10-wide line, so the
+  // stack grows monotonically until a spawn collides → game over. The bag order
+  // is fixed (see setup), so a generous press count reliably tops out; presses
+  // after game over are no-ops (withTurn).
+  for (let i = 0; i < 60; i++) {
     await page.keyboard.press('Space');
   }
   await expect(page.locator('#overlayText')).toHaveText('FIM DE JOGO');

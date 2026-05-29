@@ -1,7 +1,7 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { makePiece, randomPiece, rotate } from '../js/piece.js';
-import { SHAPES, COLS } from '../js/constants.js';
+import { makePiece, rotate } from '../js/piece.js';
+import { SHAPES } from '../js/constants.js';
 
 describe('makePiece', () => {
   test('creates a piece with type, shape and zeroed position', () => {
@@ -16,33 +16,6 @@ describe('makePiece', () => {
     const p = makePiece('I');
     p.shape[0][0] = 99;
     assert.equal(SHAPES.I[0][0], 0);
-  });
-});
-
-describe('randomPiece', () => {
-  test('centers the piece horizontally', () => {
-    const original = Math.random;
-    Math.random = () => 0;
-    const p = randomPiece();
-    Math.random = original;
-    assert.equal(p.x, Math.floor((COLS - p.shape[0].length) / 2));
-  });
-
-  test('generates only valid types', () => {
-    const types = new Set(Object.keys(SHAPES));
-    for (let i = 0; i < 50; i++) {
-      assert.ok(types.has(randomPiece().type));
-    }
-  });
-
-  test('each call returns an independent instance', () => {
-    const original = Math.random;
-    Math.random = () => 0;
-    const a = randomPiece();
-    const b = randomPiece();
-    Math.random = original;
-    a.shape[0][0] = 42;
-    assert.notEqual(b.shape[0][0], 42);
   });
 });
 

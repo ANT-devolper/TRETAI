@@ -1,4 +1,4 @@
-import { SHAPES, COLS } from './constants.js';
+import { SHAPES } from './constants.js';
 
 export function makePiece(type) {
   return {
@@ -7,14 +7,6 @@ export function makePiece(type) {
     x: 0,
     y: 0,
   };
-}
-
-export function randomPiece() {
-  const keys = Object.keys(SHAPES);
-  const type = keys[Math.floor(Math.random() * keys.length)];
-  const piece = makePiece(type);
-  piece.x = Math.floor((COLS - piece.shape[0].length) / 2);
-  return piece;
 }
 
 export function rotate(shape) {

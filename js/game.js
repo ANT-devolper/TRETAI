@@ -2,7 +2,8 @@ import {
   COLS, ROWS, WALL_KICKS, LOCK_DELAY,
   COLORS, PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
 } from './constants.js';
-import { makePiece, randomPiece, rotate } from './piece.js';
+import { makePiece, rotate } from './piece.js';
+import { nextType } from './bag.js';
 import { newBoard, collides, merge, clearLines, computeGhostY } from './board.js';
 import { lineScore, levelFromScore, dropIntervalForLevel } from './scoring.js';
 import {
@@ -22,6 +23,7 @@ const state = {
   board: null,
   current: null,
   next: null,
+  bag: [],
   hold: null,
   canHold: true,
   score: 0,
@@ -77,12 +79,18 @@ function renderHold() {
   drawPiecePreview(holdCtx, dom.holdCanvas, state.hold, state.previewCell, !state.canHold);
 }
 
+function pullPiece() {
+  const { type, bag } = nextType(state.bag);
+  state.bag = bag;
+  return makePiece(type);
+}
+
 function spawn(piece) {
-  state.current = piece || state.next || randomPiece();
+  state.current = piece || state.next || pullPiece();
   state.current.x = Math.floor((COLS - state.current.shape[0].length) / 2);
   state.current.y = 0;
   if (!piece) {
-    state.next = randomPiece();
+    state.next = pullPiece();
     renderNext();
   }
   state.canHold = true;
@@ -268,7 +276,8 @@ function reset() {
   state.gameOver = false;
   state.hold = null;
   state.canHold = true;
-  state.next = randomPiece();
+  state.bag = [];
+  state.next = pullPiece();
   spawn();
   renderHold();
   renderStats(state.score, state.lines, state.level);
