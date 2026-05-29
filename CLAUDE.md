@@ -125,10 +125,10 @@ TRETAI/
 ### Commits, PRs and documentation
 
 17. **Everything in English.** Commit messages, PR titles and descriptions, README, CLAUDE.md, code comments and any other documentation are written in English. No exceptions.
-18. **Conventional Commits.** Types: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `test`.
+18. **Conventional Commits.** Format `type(scope): description`, imperative mood, lowercase, no trailing period. Types: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `test`, `perf`, `build`, `ci`, `revert`. Scope is optional. Breaking changes add `!` after the type/scope and a `BREAKING CHANGE:` footer.
 19. **Message includes motivation.** Commit body explains the "why" of the change, not just the "what".
 20. **Do not add co-authorship.** Do not apply `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`.
-21. **Never `git push` without an explicit request.** Local commits may be created when the user asks to commit, but pushing to `origin` only happens when the user explicitly says "push", "pusha", "envia", "publica" or equivalent. When in doubt, ask first.
+21. **Commit autonomously; never `git push` without an explicit request.** Once a change is green and clean, commit it without asking (typically at each green or after a refactor, so history reads as small working steps). Work directly on `main` — no per-task branches. Pushing to `origin` only happens when the user explicitly says "push", "pusha", "envia", "publica" or equivalent. When in doubt about pushing, ask first.
 
 ### Tests
 
