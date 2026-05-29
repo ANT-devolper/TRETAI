@@ -106,7 +106,8 @@ function playTone(ctx, frequency, startTime, duration) {
 }
 
 export function playLineClearSfx(lines) {
-  if (userPaused) return;
+  // SFX are independent of the music stream: muting the music (M) must not
+  // silence sound effects, so we deliberately do not consult userPaused here.
   const notes = LINE_CLEAR_NOTES[lines];
   if (!notes) return;
   const ctx = getSfxCtx();
