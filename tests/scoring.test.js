@@ -25,28 +25,28 @@ describe('lineScore', () => {
 describe('levelFromScore', () => {
   test('starts at 1 below the first threshold', () => {
     assert.equal(levelFromScore(0), 1);
-    assert.equal(levelFromScore(250), 1);
-    assert.equal(levelFromScore(499), 1);
+    assert.equal(levelFromScore(750), 1);
+    assert.equal(levelFromScore(1499), 1);
   });
 
   test('crosses each progressive threshold', () => {
-    assert.equal(levelFromScore(500), 2);
-    assert.equal(levelFromScore(1499), 2);
-    assert.equal(levelFromScore(1500), 3);
-    assert.equal(levelFromScore(2999), 3);
-    assert.equal(levelFromScore(3000), 4);
-    assert.equal(levelFromScore(4999), 4);
-    assert.equal(levelFromScore(5000), 5);
-    assert.equal(levelFromScore(7999), 5);
-    assert.equal(levelFromScore(8000), 6);
-    assert.equal(levelFromScore(11999), 6);
-    assert.equal(levelFromScore(12000), 7);
-    assert.equal(levelFromScore(17999), 7);
-    assert.equal(levelFromScore(18000), 8);
+    assert.equal(levelFromScore(1500), 2);
+    assert.equal(levelFromScore(3999), 2);
+    assert.equal(levelFromScore(4000), 3);
+    assert.equal(levelFromScore(7999), 3);
+    assert.equal(levelFromScore(8000), 4);
+    assert.equal(levelFromScore(13999), 4);
+    assert.equal(levelFromScore(14000), 5);
+    assert.equal(levelFromScore(21999), 5);
+    assert.equal(levelFromScore(22000), 6);
+    assert.equal(levelFromScore(33999), 6);
+    assert.equal(levelFromScore(34000), 7);
+    assert.equal(levelFromScore(49999), 7);
+    assert.equal(levelFromScore(50000), 8);
   });
 
   test('caps at level 8 above the last threshold', () => {
-    assert.equal(levelFromScore(20000), 8);
+    assert.equal(levelFromScore(60000), 8);
     assert.equal(levelFromScore(999999), 8);
   });
 });

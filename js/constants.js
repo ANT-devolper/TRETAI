@@ -22,7 +22,7 @@ export const WALL_KICKS = [0, -1, 1, -2, 2];
 export const LOCK_DELAY = 500;
 
 export const MAX_LEVEL = 8;
-export const LEVEL_SCORE_THRESHOLDS = [0, 500, 1500, 3000, 5000, 8000, 12000, 18000];
+export const LEVEL_SCORE_THRESHOLDS = [0, 1500, 4000, 8000, 14000, 22000, 34000, 50000];
 export const LEVEL_DROP_INTERVALS  = [1000, 850, 720, 600, 480, 370, 260, 150];
 
 export const SCROLL_KEYS = [
