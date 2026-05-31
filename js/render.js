@@ -1,17 +1,21 @@
 import { COLORS, COLS, ROWS, TRAIL_ALPHA_START, TRAIL_WHITE_ALPHA } from './constants.js';
 
-export function drawCell(ctx, type, x, y, size) {
-  ctx.fillStyle = COLORS[type];
-  ctx.fillRect(x * size, y * size, size, size);
+function paintBevelCell(ctx, color, px, py, size, bevel) {
+  ctx.fillStyle = color;
+  ctx.fillRect(px, py, size, size);
   ctx.fillStyle = 'rgba(255,255,255,0.2)';
-  ctx.fillRect(x * size, y * size, size, 4);
-  ctx.fillRect(x * size, y * size, 4, size);
+  ctx.fillRect(px, py, size, bevel);
+  ctx.fillRect(px, py, bevel, size);
   ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.fillRect(x * size, y * size + size - 4, size, 4);
-  ctx.fillRect(x * size + size - 4, y * size, 4, size);
+  ctx.fillRect(px, py + size - bevel, size, bevel);
+  ctx.fillRect(px + size - bevel, py, bevel, size);
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
-  ctx.strokeRect(x * size, y * size, size, size);
+  ctx.strokeRect(px, py, size, size);
+}
+
+export function drawCell(ctx, type, x, y, size) {
+  paintBevelCell(ctx, COLORS[type], x * size, y * size, size, 4);
 }
 
 export function drawGrid(ctx, canvas, cell) {
@@ -106,16 +110,7 @@ export function drawPiecePreview(ctx, canvasEl, piece, cellSize, dim = false) {
       if (!shape[r][c]) continue;
       const px = offX + c * cellSize;
       const py = offY + r * cellSize;
-      ctx.fillStyle = COLORS[piece.type];
-      ctx.fillRect(px, py, cellSize, cellSize);
-      ctx.fillStyle = 'rgba(255,255,255,0.2)';
-      ctx.fillRect(px, py, cellSize, 3);
-      ctx.fillRect(px, py, 3, cellSize);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillRect(px, py + cellSize - 3, cellSize, 3);
-      ctx.fillRect(px + cellSize - 3, py, 3, cellSize);
-      ctx.strokeStyle = '#000';
-      ctx.strokeRect(px, py, cellSize, cellSize);
+      paintBevelCell(ctx, COLORS[piece.type], px, py, cellSize, 3);
     }
   }
   if (dim) {
