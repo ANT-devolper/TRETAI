@@ -34,12 +34,20 @@ canvas {
   display: block;
 }
 
+.panel-fit {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
 .panel {
   display: flex;
   flex-direction: column;
   gap: clamp(6px, 1vh, 16px);
   min-width: 0;
-  flex: 0 0 auto;
+  transform-origin: top center;
+  transform: scale(var(--panel-scale, 1));
 }
 
 .panel canvas {

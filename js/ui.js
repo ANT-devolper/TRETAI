@@ -11,6 +11,7 @@ export const dom = {
   overlayDetail: document.getElementById('overlayDetail'),
   restartBtn: document.getElementById('restartBtn'),
   panel: document.querySelector('.panel'),
+  panelFit: document.querySelector('.panel-fit'),
   musicBtn: document.getElementById('musicBtn'),
 };
 
@@ -46,6 +47,21 @@ export function hideOverlay() {
   dom.restartBtn.classList.remove('show');
   dom.overlayDetail.textContent = '';
   dom.overlayDetail.classList.remove('show');
+}
+
+// Natural (unscaled) height of the panel, used to compute the fit scale.
+// Reset the scale to 1 first so getBoundingClientRect reports the full height.
+export function measurePanelNaturalHeight() {
+  dom.panel.style.setProperty('--panel-scale', '1');
+  return dom.panel.getBoundingClientRect().height;
+}
+
+// Apply the fit scale to the panel and pin the wrapper to the available height.
+// transform:scale doesn't shrink the layout box, so without a fixed wrapper
+// height the natural panel size would still grow .game and overflow the page.
+export function applyPanelScale(scale, availableHeight) {
+  dom.panel.style.setProperty('--panel-scale', String(scale));
+  dom.panelFit.style.height = availableHeight + 'px';
 }
 
 export function renderMusicState({ playing }) {

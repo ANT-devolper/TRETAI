@@ -1,6 +1,10 @@
 export const COLS = 10;
 export const ROWS = 20;
 
+export const PREVIEW_MIN = 60;
+export const PREVIEW_MAX = 120;
+export const PREVIEW_VH_FACTOR = 0.12; // previews shrink with viewport height
+
 export const COLORS = {
   I: '#00f0f0', O: '#f0f000', T: '#a000f0',
   S: '#00f000', Z: '#f00000', J: '#0000f0', L: '#f0a000',

@@ -1,4 +1,4 @@
-import { COLS, ROWS } from './constants.js';
+import { COLS, ROWS, PREVIEW_MIN, PREVIEW_MAX, PREVIEW_VH_FACTOR } from './constants.js';
 
 export function computeLayout(vw, vh) {
   if (vw === undefined) vw = document.documentElement.clientWidth;
@@ -11,7 +11,16 @@ export function computeLayout(vw, vh) {
   const cellByW = Math.floor(availW / COLS);
   const cellByH = Math.floor(availH / ROWS);
   const cell = Math.max(10, Math.min(cellByW, cellByH));
-  const previewSize = Math.max(60, Math.min(120, panelWidth - 24));
+  const previewByH = Math.floor(vh * PREVIEW_VH_FACTOR);
+  const previewSize = Math.max(PREVIEW_MIN, Math.min(PREVIEW_MAX, panelWidth - 24, previewByH));
   const previewCell = Math.floor(previewSize / 5);
   return { cell, previewSize, previewCell, panelWidth };
+}
+
+// Linear factor that scales the panel down until its natural height fits the
+// available height — mirrors how the board scales its cell to fit. Never
+// enlarges (caps at 1) and guards against a zero/negative measurement.
+export function scaleToFit(naturalHeight, availableHeight) {
+  if (naturalHeight <= 0) return 1;
+  return Math.min(1, availableHeight / naturalHeight);
 }

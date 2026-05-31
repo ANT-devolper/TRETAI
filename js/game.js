@@ -13,8 +13,9 @@ import { createBurst, stepParticles } from './particles.js';
 import { createDropTrail, stepTrails } from './trails.js';
 import {
   dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
+  measurePanelNaturalHeight, applyPanelScale,
 } from './ui.js';
-import { computeLayout } from './resize.js';
+import { computeLayout, scaleToFit } from './resize.js';
 import { bindKeyboard } from './input.js';
 import * as audio from './audio.js';
 import * as highscore from './highscore.js';
@@ -227,6 +228,11 @@ function applyLayout() {
     renderNext();
     renderHold();
   }
+  // Scale the whole HUD down until it fits the board height, mirroring how the
+  // board scales its cell — so the panel is never clipped on short viewports.
+  const available = dom.canvas.height;
+  const natural = measurePanelNaturalHeight();
+  applyPanelScale(scaleToFit(natural, available), available);
 }
 
 function loop(time) {

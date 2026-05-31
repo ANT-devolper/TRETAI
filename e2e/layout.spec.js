@@ -31,4 +31,38 @@ test.describe('Layout', () => {
     const scrollY = await page.evaluate(() => window.scrollY);
     expect(scrollY).toBe(0);
   });
+
+  test('HUD stays fully inside the viewport on a short screen', async ({ page }) => {
+    await page.goto('/');
+    await page.setViewportSize({ width: 900, height: 360 });
+
+    const vh = 360;
+    // The panel and its last box (controls) must both fit within the viewport.
+    await expect.poll(async () => {
+      const panel = await page.locator('.panel').boundingBox();
+      const controls = await page.locator('.box.controls').boundingBox();
+      return panel.y >= 0
+        && panel.y + panel.height <= vh + 1
+        && controls.y + controls.height <= vh + 1;
+    }).toBe(true);
+  });
+
+  test('short viewport produces no page scroll', async ({ page }) => {
+    await page.goto('/');
+    await page.setViewportSize({ width: 900, height: 360 });
+    await expect.poll(async () => page.evaluate(() => {
+      const el = document.documentElement;
+      return el.scrollHeight <= el.clientHeight;
+    })).toBe(true);
+  });
+
+  test('panel is not scaled down on a tall viewport', async ({ page }) => {
+    await page.goto('/');
+    await page.setViewportSize({ width: 1600, height: 1200 });
+    await expect.poll(async () =>
+      page.locator('.panel').evaluate((el) =>
+        getComputedStyle(el).getPropertyValue('--panel-scale').trim()
+      )
+    ).toBe('1');
+  });
 });
