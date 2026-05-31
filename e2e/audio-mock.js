@@ -9,6 +9,8 @@ export async function mockAudio(page) {
         this.muted = false;
         this.loop = false;
         this.preload = 'none';
+        // Expose the latest instance so specs can observe volume/duck.
+        window.__audioEl = this;
       }
       play() {
         this.paused = false;

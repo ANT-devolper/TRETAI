@@ -113,6 +113,49 @@ canvas {
   background: #cc8a00;
 }
 
+.volume-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: clamp(4px, 0.6vh, 6px);
+  border-radius: 999px;
+  background: #333;
+  cursor: pointer;
+  outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: clamp(14px, 1.8vh, 18px);
+  height: clamp(14px, 1.8vh, 18px);
+  border-radius: 50%;
+  background: #0ff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: clamp(14px, 1.8vh, 18px);
+  height: clamp(14px, 1.8vh, 18px);
+  border-radius: 50%;
+  background: #0ff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.volume-slider:hover::-webkit-slider-thumb,
+.volume-slider:active::-webkit-slider-thumb {
+  background: #0cc;
+}
+
+.volume-slider:hover::-moz-range-thumb,
+.volume-slider:active::-moz-range-thumb {
+  background: #0cc;
+}
+
 .board-wrap {
   position: relative;
 }

@@ -40,6 +40,10 @@ export const STREAM_URL = 'https://ice1.somafm.com/groovesalad-128-mp3';
 export const DEFAULT_VOLUME = 0.6;
 export const DUCK_VOLUME = 0.2;
 
+export const VOLUME_KEY = 'tretai.volume';
+// Master volume in [0, 1] scaling both music and SFX; 1 preserves the tuned mix.
+export const DEFAULT_MASTER_VOLUME = 1;
+
 // Partículas: quantidade por célula em função das linhas limpas no lock.
 // Single (1) não emite; double/triple/tetris escalam para premiar combos maiores.
 export const PARTICLES_PER_CELL = { 2: 5, 3: 9, 4: 16 };

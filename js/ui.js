@@ -13,6 +13,7 @@ export const dom = {
   panel: document.querySelector('.panel'),
   panelFit: document.querySelector('.panel-fit'),
   musicBtn: document.getElementById('musicBtn'),
+  volumeEl: document.getElementById('volume'),
 };
 
 export const ctx = dom.canvas.getContext('2d');
@@ -68,4 +69,9 @@ export function renderMusicState({ playing }) {
   if (!dom.musicBtn) return;
   dom.musicBtn.textContent = playing ? '⏸ Pausar' : '▶ Tocar';
   dom.musicBtn.dataset.state = playing ? 'playing' : 'paused';
+}
+
+export function renderVolume(v) {
+  if (!dom.volumeEl) return;
+  dom.volumeEl.value = String(Math.round(v * 100));
 }

@@ -13,12 +13,13 @@ import { createBurst, stepParticles } from './particles.js';
 import { createDropTrail, stepTrails } from './trails.js';
 import {
   dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
-  measurePanelNaturalHeight, applyPanelScale,
+  renderVolume, measurePanelNaturalHeight, applyPanelScale,
 } from './ui.js';
 import { computeLayout, scaleToFit } from './resize.js';
 import { bindKeyboard } from './input.js';
 import * as audio from './audio.js';
 import * as highscore from './highscore.js';
+import * as volume from './volume.js';
 
 const state = {
   board: null,
@@ -307,6 +308,14 @@ export function start() {
   window.addEventListener('resize', applyLayout);
   dom.restartBtn.addEventListener('click', reset);
   dom.musicBtn.addEventListener('click', () => audio.toggle());
+  const initialVolume = volume.read();
+  audio.setVolume(initialVolume);
+  renderVolume(initialVolume);
+  dom.volumeEl.addEventListener('input', () => {
+    const v = Number(dom.volumeEl.value) / 100;
+    audio.setVolume(v);
+    volume.write(v);
+  });
   audio.onStateChange(renderMusicState);
   renderMusicState({ playing: audio.isPlaying() });
   requestAnimationFrame(loop);

@@ -2,12 +2,21 @@ import {
   DEFAULT_VOLUME, DUCK_VOLUME,
   SFX_VOLUME, LINE_CLEAR_NOTES,
 } from './constants.js';
+import { read as readVolume, clampVolume } from './volume.js';
 
 let audioEl = null;
 let userPaused = false;
 let armed = false;
 let sfxCtx = null;
+// Master volume in [0, 1] scaling both the music stream and the SFX.
+let masterVolume = readVolume();
+let ducked = false;
 const stateListeners = [];
+
+function applyMusicVolume() {
+  if (!audioEl) return;
+  audioEl.volume = masterVolume * (ducked ? DUCK_VOLUME : DEFAULT_VOLUME);
+}
 
 function emit() {
   const snapshot = { playing: isPlaying() };
@@ -25,7 +34,7 @@ export function init(url) {
   audioEl = new Audio(url);
   audioEl.loop = true;
   audioEl.preload = 'none';
-  audioEl.volume = DEFAULT_VOLUME;
+  applyMusicVolume();
   audioEl.addEventListener('play', emit);
   audioEl.addEventListener('pause', emit);
   audioEl.addEventListener('error', () => {
@@ -50,8 +59,13 @@ export function toggle() {
 }
 
 export function duck(on) {
-  if (!audioEl) return;
-  audioEl.volume = on ? DUCK_VOLUME : DEFAULT_VOLUME;
+  ducked = on;
+  applyMusicVolume();
+}
+
+export function setVolume(v) {
+  masterVolume = clampVolume(v);
+  applyMusicVolume();
 }
 
 export function pauseForGame() {
@@ -97,7 +111,7 @@ function playTone(ctx, frequency, startTime, duration) {
   osc.type = 'square';
   osc.frequency.value = frequency;
   gain.gain.setValueAtTime(0, startTime);
-  gain.gain.linearRampToValueAtTime(SFX_VOLUME, startTime + 0.01);
+  gain.gain.linearRampToValueAtTime(SFX_VOLUME * masterVolume, startTime + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
   osc.connect(gain);
   gain.connect(ctx.destination);
