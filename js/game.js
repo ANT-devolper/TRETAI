@@ -79,6 +79,14 @@ function renderHold() {
   drawPiecePreview(holdCtx, dom.holdCanvas, state.hold, state.previewCell, !state.canHold);
 }
 
+function applyScore(points, clearedLines = 0) {
+  state.score += points;
+  if (clearedLines) state.lines += clearedLines;
+  state.level = levelFromScore(state.score);
+  state.dropInterval = dropIntervalForLevel(state.level);
+  renderStats(state.score, state.lines, state.level);
+}
+
 function pullPiece() {
   const { type, bag } = nextType(state.bag);
   state.bag = bag;
@@ -139,11 +147,7 @@ function lockPiece() {
   }
   const cleared = clearLines(state.board);
   if (cleared > 0) {
-    state.score += lineScore(cleared, state.level);
-    state.lines += cleared;
-    state.level = levelFromScore(state.score);
-    state.dropInterval = dropIntervalForLevel(state.level);
-    renderStats(state.score, state.lines, state.level);
+    applyScore(lineScore(cleared, state.level), cleared);
     audio.playLineClearSfx(cleared);
     emitLineClearParticles(fullRows);
   }
@@ -153,10 +157,7 @@ function lockPiece() {
 function softDrop() {
   if (collides(state.board, state.current, 0, 1)) return;
   state.current.y++;
-  state.score += 1;
-  state.level = levelFromScore(state.score);
-  state.dropInterval = dropIntervalForLevel(state.level);
-  renderStats(state.score, state.lines, state.level);
+  applyScore(1);
 }
 
 function hardDrop() {
@@ -170,10 +171,7 @@ function hardDrop() {
     state.current, startY, state.current.y, state.cell, COLORS[state.current.type],
   );
   for (const t of trail) state.trails.push(t);
-  state.score += drop * 2;
-  state.level = levelFromScore(state.score);
-  state.dropInterval = dropIntervalForLevel(state.level);
-  renderStats(state.score, state.lines, state.level);
+  applyScore(drop * 2);
   lockPiece();
 }
 
