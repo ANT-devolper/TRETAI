@@ -65,4 +65,31 @@ test.describe('Layout', () => {
       )
     ).toBe('1');
   });
+
+  // Regression guard for the clipped-HUD bug: across a sweep of shrinking
+  // heights (and both narrow and wide widths) the whole panel — and in
+  // particular its last box, "Controles", which used to get cut off — must
+  // always stay within the viewport, with no page scroll.
+  for (const { w, h } of [
+    { w: 1280, h: 700 }, { w: 1280, h: 560 }, { w: 1280, h: 440 },
+    { w: 900, h: 500 }, { w: 900, h: 360 }, { w: 700, h: 320 },
+  ]) {
+    test(`HUD fits entirely at ${w}x${h}`, async ({ page }) => {
+      await page.goto('/');
+      await page.setViewportSize({ width: w, height: h });
+      await expect.poll(async () => {
+        const panel = await page.locator('.panel').boundingBox();
+        const controls = await page.locator('.box.controls').boundingBox();
+        const noScroll = await page.evaluate(() => {
+          const el = document.documentElement;
+          return el.scrollHeight <= el.clientHeight;
+        });
+        return panel.y >= 0
+          && panel.x >= 0
+          && panel.y + panel.height <= h + 1
+          && controls.y + controls.height <= h + 1
+          && noScroll;
+      }).toBe(true);
+    });
+  }
 });
