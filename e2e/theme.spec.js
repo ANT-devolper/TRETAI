@@ -6,16 +6,31 @@ test.describe('Theme switcher', () => {
     await mockAudio(page);
   });
 
-  test('settings gear is visible in the top-right corner of the board', async ({ page }) => {
+  test('settings gear floats in the viewport top-right corner, outside the game', async ({ page }) => {
     await page.goto('/');
     const gear = page.locator('#settingsBtn');
     await expect(gear).toBeVisible();
+    // Pinned to the viewport, not the board.
+    await expect(gear).toHaveCSS('position', 'fixed');
 
-    const board = await page.locator('#board').boundingBox();
+    const vp = page.viewportSize();
     const btn = await gear.boundingBox();
-    // Sits near the board's top-right edge.
-    expect(btn.x + btn.width).toBeGreaterThan(board.x + board.width / 2);
-    expect(btn.y).toBeLessThan(board.y + board.height / 2);
+    // Near the top-right corner of the screen.
+    expect(btn.x + btn.width).toBeGreaterThan(vp.width * 0.8);
+    expect(btn.y).toBeLessThan(vp.height * 0.2);
+    // Fully inside the viewport even when space is tight.
+    expect(btn.x + btn.width).toBeLessThanOrEqual(vp.width);
+    expect(btn.y).toBeGreaterThanOrEqual(0);
+  });
+
+  test('gear stays inside a horizontally reduced viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 480, height: 720 });
+    await page.goto('/');
+    const gear = page.locator('#settingsBtn');
+    await expect(gear).toBeVisible();
+    const btn = await gear.boundingBox();
+    expect(btn.x + btn.width).toBeLessThanOrEqual(480);
+    expect(btn.x).toBeGreaterThanOrEqual(0);
   });
 
   test('clicking the gear opens the menu and pauses the game', async ({ page }) => {

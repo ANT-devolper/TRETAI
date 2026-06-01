@@ -12,13 +12,6 @@
   <div class="game">
     <div class="board-wrap">
       <canvas id="board" width="300" height="600"></canvas>
-      <button id="settingsBtn" type="button" class="settings-btn"
-              aria-label="Configurações">⚙</button>
-      <div id="settingsMenu" class="settings-menu">
-        <h2>Tema</h2>
-        <div id="themeOptions" class="theme-options"></div>
-        <button id="settingsClose" type="button" class="settings-close">Fechar</button>
-      </div>
       <div id="overlay" class="overlay">
         <div id="overlayText">PAUSADO</div>
         <div id="overlayDetail" class="overlay-detail"></div>
@@ -72,6 +65,13 @@
         </div>
       </div>
     </div>
+  </div>
+  <button id="settingsBtn" type="button" class="settings-btn"
+          aria-label="Configurações">⚙</button>
+  <div id="settingsMenu" class="settings-menu">
+    <h2>Tema</h2>
+    <div id="themeOptions" class="theme-options"></div>
+    <button id="settingsClose" type="button" class="settings-close">Fechar</button>
   </div>
   <script type="module" src="js/main.js"></script>
 </body>
