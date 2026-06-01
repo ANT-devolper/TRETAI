@@ -10,6 +10,7 @@ export const dom = {
   overlayText: document.getElementById('overlayText'),
   overlayDetail: document.getElementById('overlayDetail'),
   restartBtn: document.getElementById('restartBtn'),
+  overlayHint: document.getElementById('overlayHint'),
   panel: document.querySelector('.panel'),
   panelFit: document.querySelector('.panel-fit'),
   musicBtn: document.getElementById('musicBtn'),
@@ -38,6 +39,7 @@ export function showOverlay(text, withRestart = false, detail = null) {
   dom.overlayText.textContent = text;
   dom.overlay.classList.add('show');
   dom.restartBtn.classList.toggle('show', withRestart);
+  dom.overlayHint.classList.toggle('show', withRestart);
   if (detail) {
     dom.overlayDetail.textContent = detail;
     dom.overlayDetail.classList.add('show');
@@ -50,6 +52,7 @@ export function showOverlay(text, withRestart = false, detail = null) {
 export function hideOverlay() {
   dom.overlay.classList.remove('show');
   dom.restartBtn.classList.remove('show');
+  dom.overlayHint.classList.remove('show');
   dom.overlayDetail.textContent = '';
   dom.overlayDetail.classList.remove('show');
 }

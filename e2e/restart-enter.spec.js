@@ -24,10 +24,21 @@ test.describe('Restart with Enter', () => {
     await setup(page);
     await stackUntilGameOver(page);
 
+    // The overlay hints that Enter (and the button) restart.
+    await expect(page.locator('#overlayHint')).toBeVisible();
+
     await page.keyboard.press('Enter');
 
     await expect(page.locator('#overlay')).not.toHaveClass(/show/);
     await expect(page.locator('#score')).toHaveText('0');
+  });
+
+  test('the restart hint is hidden while merely paused', async ({ page }) => {
+    await setup(page);
+    await page.keyboard.press('p');
+
+    await expect(page.locator('#overlay')).toHaveClass(/show/);
+    await expect(page.locator('#overlayHint')).toBeHidden();
   });
 
   test('Enter does not restart while the game is in progress', async ({ page }) => {

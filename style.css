@@ -275,6 +275,19 @@ canvas {
   background: var(--accent-hover);
 }
 
+.overlay-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #fff;
+  opacity: 0.65;
+  text-align: center;
+  display: none;
+}
+
+.overlay-hint.show {
+  display: block;
+}
+
 /* Floating control pinned to the viewport corner — independent of the game box,
    so it never sits on the playfield and stays put on narrow screens. */
 .settings-btn {

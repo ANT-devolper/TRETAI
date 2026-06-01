@@ -75,7 +75,7 @@ TRETAI/
 - 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
 - Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
 - Score, line count, level (speeds up `dropInterval`).
-- Pause and game over overlay with "Play again" button; on game over, `Enter` also restarts (no-op while a game is in progress).
+- Pause and game over overlay with "Play again" button; on game over, `Enter` also restarts (no-op while a game is in progress) and the overlay shows a hint pointing to both ways to restart.
 - **No-scroll** layout (vertical/horizontal locked), adaptive to any viewport — `CELL` recomputed on `resize`.
 - Ambient lofi music via SomaFM Groove Salad stream with:
   - Play/pause button on the panel + `M` shortcut.

@@ -250,4 +250,8 @@ so Enter during a running or paused game is a no-op and never wipes a run in
 progress. Covered by `e2e/restart-enter.spec.js`: one spec reaches game over
 (deterministic 7-bag via `Math.random = () => 0`) and asserts Enter clears the
 overlay and resets the score, a second confirms Enter mid-run leaves the overlay
-hidden and the score untouched (red before the handler, green after).
+hidden and the score untouched (red before the handler, green after). The game
+over overlay also shows a hint line ("Pressione Enter ou clique no botão") so the
+shortcut is discoverable; `#overlayHint` is toggled alongside the restart button
+(`withRestart`) in `showOverlay`/`hideOverlay`, so it only appears on game over —
+not on pause — asserted both visible (game over) and hidden (paused) in the spec.
