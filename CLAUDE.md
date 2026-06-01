@@ -30,6 +30,7 @@ TRETAI/
 │   ├── bag.js              # shuffleBag, newBag, nextType — 7-bag randomizer (pure)
 │   ├── board.js            # newBoard, collides, merge, clearLines, computeGhostY (pure)
 │   ├── scoring.js          # lineScore, levelFromLines, dropIntervalForLevel (pure)
+│   ├── combo.js            # advanceCombo, comboBonus, comboParticleCount, comboToneFreq (pure)
 │   ├── render.js           # canvas drawing primitives (pure, take ctx + data)
 │   ├── ui.js               # DOM references, canvas ctx, renderStats, showOverlay, etc.
 │   ├── resize.js           # pure computeLayout(vw, vh); default reads from document
@@ -39,6 +40,8 @@ TRETAI/
 │   ├── trails.js           # createDropTrail, stepTrails (pure) — hard-drop trail effect
 │   ├── themes.js           # THEMES data + getTheme/themeIds (pure) — palettes
 │   ├── theme.js            # selected-theme persistence (localStorage) + clampThemeId
+│   ├── highscore.js        # high-score persistence (localStorage) + isNew
+│   ├── volume.js           # master-volume persistence (localStorage) + clampVolume
 │   ├── visited.js          # first-visit flag persistence (localStorage)
 │   └── game.js             # orchestrator: mutable state + loop + wiring
 ├── tests/                  # unit (node --test)
@@ -46,10 +49,13 @@ TRETAI/
 │   ├── bag.test.js
 │   ├── board.test.js
 │   ├── scoring.test.js
+│   ├── combo.test.js
 │   ├── resize.test.js
 │   ├── particles.test.js
 │   ├── trails.test.js
-│   └── themes.test.js
+│   ├── themes.test.js
+│   ├── highscore.test.js
+│   └── volume.test.js
 └── e2e/                    # Playwright
     ├── audio-mock.js       # helper: replaces window.Audio with MockAudio
     ├── fixtures.js         # helper: test/expect that seed the visited flag
@@ -60,13 +66,19 @@ TRETAI/
     ├── persistence.spec.js
     ├── layout.spec.js
     ├── hard-drop-trail.spec.js
+    ├── combo-sfx.spec.js
+    ├── highscore.spec.js
+    ├── highscore-gameover.spec.js
+    ├── restart-enter.spec.js
+    ├── sfx-mute.spec.js
+    ├── volume.spec.js
     ├── tutorial.spec.js
     └── theme.spec.js
 ```
 
 ### Layers
 
-- **Pure** (no state, no DOM): `piece.js`, `bag.js`, `board.js`, `scoring.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`.
+- **Pure** (no state, no DOM): `piece.js`, `bag.js`, `board.js`, `scoring.js`, `combo.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`.
 - **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners), `theme.js`/`highscore.js`/`volume.js`/`visited.js` (localStorage).
 - **Orchestration**: `game.js` is the only module with mutable game state. `audio.js` keeps its own encapsulated state.
 - **Bootstrap**: `main.js`.
@@ -78,6 +90,7 @@ TRETAI/
 - 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
 - Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
 - Score, line count, level (speeds up `dropInterval`).
+- **Combo**: consecutive line-clearing locks build a combo, reset by any lock that clears nothing. From ×2 on it rewards the player with a classic bonus (`50 × (combo-1) × level` added to the line score), a pulsing "COMBO ×N" banner, growing screen shake + color flash, boosted line-clear particles, and an extra ascending square-wave tone layered on the line SFX. Pure logic lives in `combo.js` (`advanceCombo`, `comboBonus`, `comboParticleCount`, `comboToneFreq`).
 - Pause and game over overlay with "Play again" button; on game over, `Enter` also restarts (no-op while a game is in progress) and the overlay shows a hint pointing to both ways to restart.
 - **No-scroll** layout (vertical/horizontal locked), adaptive to any viewport — `CELL` recomputed on `resize`.
 - Ambient lofi music via SomaFM Groove Salad stream with:
@@ -181,7 +194,7 @@ D. **Definition of Done** — a change is done only when all of these hold:
 
 ### Tests
 
-22. **Every pure function needs a unit test.** New behavior in any module of the Pure layer (`piece.js`, `bag.js`, `board.js`, `scoring.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`) requires a matching case under `tests/`. The lone exception is `render.js`: it is pure but draws to a canvas, so its output is verified by E2E pixel-sampling specs (rule 23) rather than unit tests.
+22. **Every pure function needs a unit test.** New behavior in any module of the Pure layer (`piece.js`, `bag.js`, `board.js`, `scoring.js`, `combo.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`) requires a matching case under `tests/`. The lone exception is `render.js`: it is pure but draws to a canvas, so its output is verified by E2E pixel-sampling specs (rule 23) rather than unit tests.
 23. **DOM, audio and integration → E2E.** Do not try to emulate DOM in Node; use Playwright under `e2e/` for real flows.
 24. **Test behavior, not implementation.** Assertions on input→output or observable state (DOM, `localStorage`); never on internal module details.
 25. **Refactor for testability when useful.** If a pure function gets trapped behind side effects, extract the pure part to accept parameters (e.g., `computeLayout(vw, vh)`).

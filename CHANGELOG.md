@@ -270,7 +270,19 @@ pause/resume behavior. Selecting a theme now also closes the menu and resumes
 red before the change, green after); the existing `pause.spec.js` and
 menu-close/theme-switch specs stay green.
 
-## 25. First-visit tutorial
+## 25. Combo rewards
+Consecutive line-clearing locks now build a combo, reset by any lock that clears
+nothing. From ×2 onward the player is rewarded across score, visuals and sound:
+a classic bonus (`50 × (combo-1) × level`) added to the line score, a pulsing
+"COMBO ×N" banner, screen shake and a board color flash that grow with the
+combo, boosted line-clear particles, and an extra ascending square-wave tone
+layered on the line SFX. Pure logic lives in `js/combo.js` (`advanceCombo`,
+`comboBonus`, `comboParticleCount`, `comboToneFreq`), covered by
+`tests/combo.test.js`; `e2e/combo-sfx.spec.js` validates the audio branch. It
+reuses the existing particle system, `getSfxCtx`/`playTone` and the canvas
+animation loop.
+
+## 26. First-visit tutorial
 Playtesting with people who had never played Tetris showed they struggled to
 discover the controls (the panel's "Controles" box went unnoticed). A "Como
 jogar" welcome screen now appears automatically on the first visit only — a
