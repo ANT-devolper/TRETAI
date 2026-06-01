@@ -72,6 +72,7 @@ test.describe('Theme switcher', () => {
   // Each extra theme repaints the board background to its own board.bg.
   const EXTRA_THEME_BG = {
     neon: [21, 10, 40], // #150a28
+    sunset: [36, 16, 48], // #241030
   };
   for (const [id, bg] of Object.entries(EXTRA_THEME_BG)) {
     test(`selecting the ${id} theme repaints the board background`, async ({ page }) => {

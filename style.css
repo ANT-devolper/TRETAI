@@ -33,6 +33,17 @@ html[data-theme="neon"] {
   --label: #9b7fd4;
 }
 
+html[data-theme="sunset"] {
+  --accent: #ff7b54;
+  --accent-hover: #ff9b7c;
+  --bg-page: #1f0d28;
+  --bg-game: #2b1334;
+  --bg-box: #3a1a45;
+  --border: #56285f;
+  --text: #ffe0d0;
+  --label: #c98fb0;
+}
+
 html, body {
   height: 100%;
   width: 100%;

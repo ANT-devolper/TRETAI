@@ -30,6 +30,15 @@ export const THEMES = {
     },
     board: { bg: '#150a28', grid: '#2a1550' },
   },
+  sunset: {
+    id: 'sunset',
+    name: 'Sunset',
+    colors: {
+      I: '#54d1ff', O: '#ffd166', T: '#c77dff', S: '#06d6a0',
+      Z: '#ff5d8f', J: '#7b8cff', L: '#ff924c',
+    },
+    board: { bg: '#241030', grid: '#43204d' },
+  },
 };
 
 export const DEFAULT_THEME_ID = 'classic';

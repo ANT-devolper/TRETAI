@@ -218,3 +218,10 @@ and future palette is guarded for legibility, and `e2e/theme.spec.js` gained a
 data-driven check that selecting an extra theme flips `data-theme` and repaints the
 board-background pixel to that theme's `board.bg` (red for `neon` before the entry
 existed, green after).
+
+## 21. Sunset theme
+A fourth theme, **Sunset** (vaporwave): warm pieces (orange/pink/teal/violet) over
+a deep plum board with an orange accent. Same pure pattern as Neon — a
+`THEMES.sunset` entry in `js/themes.js` and an `html[data-theme="sunset"]` block in
+`style.css`; covered by the already-generalized contrast unit guard and the
+data-driven board-pixel E2E (red for `sunset` before the entry, green after).

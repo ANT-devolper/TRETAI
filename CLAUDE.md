@@ -83,7 +83,7 @@ TRETAI/
   - Reduced volume (duck) on game over.
   - Armed after first interaction due to autoplay policy.
   - Mute via `M` is session-only; reload always starts armed.
-- **Theme switcher**: a settings gear (⚙) floating in the viewport's top-right corner pauses the game and opens a menu to pick a theme. Themes available: **Clássico** (the original cyan-on-black look), **Game Boy** (monochrome DMG green) and **Neon** (synthwave). Switching repaints both the canvas (piece colors + board background/grid) and the whole DOM (panel/background accents); the choice persists across reloads.
+- **Theme switcher**: a settings gear (⚙) floating in the viewport's top-right corner pauses the game and opens a menu to pick a theme. Themes available: **Clássico** (the original cyan-on-black look), **Game Boy** (monochrome DMG green), **Neon** (synthwave) and **Sunset** (vaporwave). Switching repaints both the canvas (piece colors + board background/grid) and the whole DOM (panel/background accents); the choice persists across reloads.
 
 ### Controls
 
