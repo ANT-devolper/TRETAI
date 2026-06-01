@@ -48,10 +48,15 @@ describe('THEMES data', () => {
     }
   });
 
-  test('gameboy pieces are all distinct from the board background', () => {
-    const { colors, board } = THEMES.gameboy;
-    for (const type of PIECE_TYPES) {
-      assert.notEqual(colors[type].toLowerCase(), board.bg.toLowerCase());
+  test('every theme keeps its pieces distinct from the board background', () => {
+    for (const id of themeIds()) {
+      const { colors, board } = THEMES[id];
+      for (const type of PIECE_TYPES) {
+        assert.notEqual(
+          colors[type].toLowerCase(), board.bg.toLowerCase(),
+          `${id}/${type} matches the board background`,
+        );
+      }
     }
   });
 

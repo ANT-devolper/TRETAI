@@ -69,6 +69,25 @@ test.describe('Theme switcher', () => {
     await expect(page.locator('#score')).toHaveCSS('color', 'rgb(155, 188, 15)');
   });
 
+  // Each extra theme repaints the board background to its own board.bg.
+  const EXTRA_THEME_BG = {
+    neon: [21, 10, 40], // #150a28
+  };
+  for (const [id, bg] of Object.entries(EXTRA_THEME_BG)) {
+    test(`selecting the ${id} theme repaints the board background`, async ({ page }) => {
+      await page.goto('/');
+      await page.locator('#settingsBtn').click();
+      await page.locator(`.theme-option[data-theme="${id}"]`).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', id);
+      const px = await page.evaluate(() => {
+        const c = document.getElementById('board');
+        const d = c.getContext('2d').getImageData(2, 2, 1, 1).data;
+        return [d[0], d[1], d[2]];
+      });
+      expect(px).toEqual(bg);
+    });
+  }
+
   test('closing the menu resumes the game', async ({ page }) => {
     await page.goto('/');
     await page.locator('#settingsBtn').click();

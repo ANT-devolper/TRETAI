@@ -206,3 +206,15 @@ unit tests in `tests/themes.test.js` (16 cases: theme shape, gameboy contrast,
 confirmed red before the modules existed) and E2E in `e2e/theme.spec.js` (gear in
 the top-right, gear opens menu + pauses, selecting Game Boy flips `data-theme` +
 accent + board-background pixel and persists across reload, closing resumes).
+
+## 20. Neon theme
+A third theme, **Neon** (synthwave): vivid pieces (cyan/magenta/lime/etc.) over a
+dark indigo board with a magenta accent. Pure addition on top of the existing
+switcher — a `THEMES.neon` entry in `js/themes.js` plus an `html[data-theme="neon"]`
+block in `style.css`; the menu lists it automatically since the option buttons are
+generated from `themeIds()`. The gameboy-specific "pieces distinct from the board
+background" unit test was generalized to iterate **all** themes, so every present
+and future palette is guarded for legibility, and `e2e/theme.spec.js` gained a
+data-driven check that selecting an extra theme flips `data-theme` and repaints the
+board-background pixel to that theme's `board.bg` (red for `neon` before the entry
+existed, green after).

@@ -21,6 +21,15 @@ export const THEMES = {
     },
     board: { bg: '#0f2f0f', grid: '#1e4d1e' },
   },
+  neon: {
+    id: 'neon',
+    name: 'Neon',
+    colors: {
+      I: '#21e6ff', O: '#ffe600', T: '#b14bff', S: '#2bff88',
+      Z: '#ff3b6b', J: '#4b6bff', L: '#ff9e2b',
+    },
+    board: { bg: '#150a28', grid: '#2a1550' },
+  },
 };
 
 export const DEFAULT_THEME_ID = 'classic';

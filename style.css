@@ -22,6 +22,17 @@ html[data-theme="gameboy"] {
   --label: #7a9b4f;
 }
 
+html[data-theme="neon"] {
+  --accent: #ff2bd6;
+  --accent-hover: #ff66e2;
+  --bg-page: #120822;
+  --bg-game: #1a0b2e;
+  --bg-box: #251042;
+  --border: #3d2063;
+  --text: #e6d9ff;
+  --label: #9b7fd4;
+}
+
 html, body {
   height: 100%;
   width: 100%;
