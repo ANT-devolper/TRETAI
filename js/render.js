@@ -1,4 +1,4 @@
-import { COLORS, COLS, ROWS, TRAIL_ALPHA_START, TRAIL_WHITE_ALPHA } from './constants.js';
+import { COLS, ROWS, TRAIL_ALPHA_START, TRAIL_WHITE_ALPHA } from './constants.js';
 
 function paintBevelCell(ctx, color, px, py, size, bevel) {
   ctx.fillStyle = color;
@@ -14,14 +14,14 @@ function paintBevelCell(ctx, color, px, py, size, bevel) {
   ctx.strokeRect(px, py, size, size);
 }
 
-export function drawCell(ctx, type, x, y, size) {
-  paintBevelCell(ctx, COLORS[type], x * size, y * size, size, 4);
+export function drawCell(ctx, type, x, y, size, colors) {
+  paintBevelCell(ctx, colors[type], x * size, y * size, size, 4);
 }
 
-export function drawGrid(ctx, canvas, cell) {
-  ctx.fillStyle = '#000';
+export function drawGrid(ctx, canvas, cell, bg, grid) {
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = '#111';
+  ctx.strokeStyle = grid;
   ctx.lineWidth = 1;
   for (let i = 1; i < COLS; i++) {
     ctx.beginPath();
@@ -37,10 +37,10 @@ export function drawGrid(ctx, canvas, cell) {
   }
 }
 
-export function drawLockedCells(ctx, board, cell) {
+export function drawLockedCells(ctx, board, cell, colors) {
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      if (board[r][c]) drawCell(ctx, board[r][c], c, r, cell);
+      if (board[r][c]) drawCell(ctx, board[r][c], c, r, cell, colors);
     }
   }
 }
@@ -60,11 +60,11 @@ export function drawGhost(ctx, piece, ghostY, cell) {
   }
 }
 
-export function drawPiece(ctx, piece, cell) {
+export function drawPiece(ctx, piece, cell, colors) {
   for (let r = 0; r < piece.shape.length; r++) {
     for (let c = 0; c < piece.shape[r].length; c++) {
       if (piece.shape[r][c]) {
-        drawCell(ctx, piece.type, piece.x + c, piece.y + r, cell);
+        drawCell(ctx, piece.type, piece.x + c, piece.y + r, cell, colors);
       }
     }
   }
@@ -98,7 +98,7 @@ export function drawParticles(ctx, particles) {
   ctx.restore();
 }
 
-export function drawPiecePreview(ctx, canvasEl, piece, cellSize, dim = false) {
+export function drawPiecePreview(ctx, canvasEl, piece, cellSize, colors, dim = false) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
   if (!piece) return;
@@ -110,7 +110,7 @@ export function drawPiecePreview(ctx, canvasEl, piece, cellSize, dim = false) {
       if (!shape[r][c]) continue;
       const px = offX + c * cellSize;
       const py = offY + r * cellSize;
-      paintBevelCell(ctx, COLORS[piece.type], px, py, cellSize, 3);
+      paintBevelCell(ctx, colors[piece.type], px, py, cellSize, 3);
     }
   }
   if (dim) {

@@ -14,6 +14,10 @@ export const dom = {
   panelFit: document.querySelector('.panel-fit'),
   musicBtn: document.getElementById('musicBtn'),
   volumeEl: document.getElementById('volume'),
+  settingsBtn: document.getElementById('settingsBtn'),
+  settingsMenu: document.getElementById('settingsMenu'),
+  settingsClose: document.getElementById('settingsClose'),
+  themeOptions: document.getElementById('themeOptions'),
 };
 
 export const ctx = dom.canvas.getContext('2d');
@@ -74,4 +78,36 @@ export function renderMusicState({ playing }) {
 export function renderVolume(v) {
   if (!dom.volumeEl) return;
   dom.volumeEl.value = String(Math.round(v * 100));
+}
+
+// Switch the DOM theme: CSS keys panel/background colors off [data-theme].
+export function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme.id;
+}
+
+// (Re)build the theme option buttons and mark the active one. Rebuilding keeps
+// ui.js stateless: game.js owns the active id and passes it on every call.
+export function renderThemeOptions(themes, activeId, onSelect) {
+  if (!dom.themeOptions) return;
+  dom.themeOptions.replaceChildren();
+  for (const { id, name } of themes) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'theme-option';
+    btn.textContent = name;
+    btn.dataset.theme = id;
+    const active = id === activeId;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', String(active));
+    btn.addEventListener('click', () => onSelect(id));
+    dom.themeOptions.appendChild(btn);
+  }
+}
+
+export function showSettings() {
+  dom.settingsMenu.classList.add('show');
+}
+
+export function hideSettings() {
+  dom.settingsMenu.classList.remove('show');
 }

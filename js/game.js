@@ -1,6 +1,6 @@
 import {
   COLS, ROWS, WALL_KICKS, LOCK_DELAY,
-  COLORS, PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
+  PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
 } from './constants.js';
 import { makePiece, rotate } from './piece.js';
 import { nextType } from './bag.js';
@@ -14,12 +14,15 @@ import { createDropTrail, stepTrails } from './trails.js';
 import {
   dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
   renderVolume, measurePanelNaturalHeight, applyPanelScale,
+  applyTheme, renderThemeOptions, showSettings, hideSettings,
 } from './ui.js';
 import { computeLayout, scaleToFit } from './resize.js';
 import { bindKeyboard } from './input.js';
 import * as audio from './audio.js';
 import * as highscore from './highscore.js';
 import * as volume from './volume.js';
+import * as theme from './theme.js';
+import { getTheme, THEMES, themeIds } from './themes.js';
 
 const state = {
   board: null,
@@ -42,16 +45,17 @@ const state = {
   particles: [],
   trails: [],
   lastFrame: 0,
+  theme: getTheme(),
 };
 
 function renderBoard() {
-  drawGrid(ctx, dom.canvas, state.cell);
-  drawLockedCells(ctx, state.board, state.cell);
+  drawGrid(ctx, dom.canvas, state.cell, state.theme.board.bg, state.theme.board.grid);
+  drawLockedCells(ctx, state.board, state.cell, state.theme.colors);
   drawTrails(ctx, state.trails);
   if (state.current && !state.gameOver) {
     const ghostY = computeGhostY(state.board, state.current);
     drawGhost(ctx, state.current, ghostY, state.cell);
-    drawPiece(ctx, state.current, state.cell);
+    drawPiece(ctx, state.current, state.cell, state.theme.colors);
   }
   drawParticles(ctx, state.particles);
 }
@@ -67,18 +71,20 @@ function emitLineClearParticles(rows) {
       if (!type) continue;
       const px = (c + 0.5) * state.cell;
       const py = (y + 0.5) * state.cell;
-      const burst = createBurst(px, py, COLORS[type], perCell, { minSize, maxSize });
+      const burst = createBurst(px, py, state.theme.colors[type], perCell, { minSize, maxSize });
       for (const p of burst) state.particles.push(p);
     }
   }
 }
 
 function renderNext() {
-  drawPiecePreview(nextCtx, dom.nextCanvas, state.next, state.previewCell);
+  drawPiecePreview(nextCtx, dom.nextCanvas, state.next, state.previewCell, state.theme.colors);
 }
 
 function renderHold() {
-  drawPiecePreview(holdCtx, dom.holdCanvas, state.hold, state.previewCell, !state.canHold);
+  drawPiecePreview(
+    holdCtx, dom.holdCanvas, state.hold, state.previewCell, state.theme.colors, !state.canHold,
+  );
 }
 
 function applyScore(points, clearedLines = 0) {
@@ -170,7 +176,7 @@ function hardDrop() {
     drop++;
   }
   const trail = createDropTrail(
-    state.current, startY, state.current.y, state.cell, COLORS[state.current.type],
+    state.current, startY, state.current.y, state.cell, state.theme.colors[state.current.type],
   );
   for (const t of trail) state.trails.push(t);
   applyScore(drop * 2);
@@ -200,6 +206,46 @@ function togglePause() {
     audio.pauseForGame();
   } else {
     hideOverlay();
+    audio.resumeForGame();
+    state.lastDrop = 0;
+  }
+}
+
+function refreshThemeOptions() {
+  renderThemeOptions(
+    themeIds().map(id => ({ id, name: THEMES[id].name })),
+    state.theme.id,
+    setTheme,
+  );
+}
+
+function setTheme(id) {
+  state.theme = getTheme(id);
+  theme.write(state.theme.id);
+  applyTheme(state.theme);
+  refreshThemeOptions();
+  if (state.board) {
+    renderBoard();
+    renderNext();
+    renderHold();
+  }
+}
+
+// The settings menu opens paused: it mirrors togglePause's pause branch so the
+// piece stops dropping and the stream is paused while the player picks a theme.
+function openSettings() {
+  if (state.gameOver) return;
+  if (!state.paused) {
+    state.paused = true;
+    audio.pauseForGame();
+  }
+  showSettings();
+}
+
+function closeSettings() {
+  hideSettings();
+  if (state.paused) {
+    state.paused = false;
     audio.resumeForGame();
     state.lastDrop = 0;
   }
@@ -292,6 +338,9 @@ function reset() {
 }
 
 export function start() {
+  state.theme = getTheme(theme.read());
+  applyTheme(state.theme);
+  refreshThemeOptions();
   applyLayout();
   state.best = highscore.read();
   reset();
@@ -307,6 +356,8 @@ export function start() {
   });
   window.addEventListener('resize', applyLayout);
   dom.restartBtn.addEventListener('click', reset);
+  dom.settingsBtn.addEventListener('click', openSettings);
+  dom.settingsClose.addEventListener('click', closeSettings);
   dom.musicBtn.addEventListener('click', () => audio.toggle());
   const initialVolume = volume.read();
   audio.setVolume(initialVolume);
