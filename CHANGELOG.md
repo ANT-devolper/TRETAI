@@ -240,3 +240,14 @@ unchanged. Guarded by the generalized contrast unit test, the data-driven board-
 E2E, and a new ghost-pixel E2E that fixes the bag order (`Math.random = () => 0`) and
 asserts the ghost darkens the light Pastel board (red with the old white ghost, green
 after threading the theme color).
+
+## 23. Restart with Enter on game over
+After a game over, pressing **Enter** now restarts the game — the same path as
+the overlay "Play again" button (`reset` in `js/game.js`). Following the
+declarative input pattern, `Enter` maps to a new `restart` action in `KEY_MAP`
+(`js/input.js`) and the handler in `bindKeyboard` is guarded by `state.gameOver`,
+so Enter during a running or paused game is a no-op and never wipes a run in
+progress. Covered by `e2e/restart-enter.spec.js`: one spec reaches game over
+(deterministic 7-bag via `Math.random = () => 0`) and asserts Enter clears the
+overlay and resets the score, a second confirms Enter mid-run leaves the overlay
+hidden and the score untouched (red before the handler, green after).

@@ -352,6 +352,7 @@ export function start() {
     hardDrop: withTurn(hardDrop),
     hold: withTurn(holdAction),
     pause: togglePause,
+    restart: () => { if (state.gameOver) reset(); },
     toggleMusic: () => audio.toggle(),
   });
   window.addEventListener('resize', applyLayout);
