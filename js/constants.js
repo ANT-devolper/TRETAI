@@ -36,6 +36,8 @@ export const SCROLL_KEYS = [
 
 export const HIGH_SCORE_KEY = 'tretai.highScore';
 
+export const THEME_KEY = 'tretai.theme';
+
 export const STREAM_URL = 'https://ice1.somafm.com/groovesalad-128-mp3';
 export const DEFAULT_VOLUME = 0.6;
 export const DUCK_VOLUME = 0.2;

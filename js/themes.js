@@ -1,0 +1,34 @@
+import { COLORS } from './constants.js';
+
+// Theme data is pure: each theme is { id, name, colors (7 pieces), board }.
+// The DOM side (panel/background) is themed in style.css keyed by the same id
+// via [data-theme]; here we only carry what the canvas needs to repaint.
+export const THEMES = {
+  classic: {
+    id: 'classic',
+    name: 'Clássico',
+    colors: COLORS,
+    board: { bg: '#000', grid: '#111' },
+  },
+  gameboy: {
+    id: 'gameboy',
+    name: 'Game Boy',
+    // Seven distinct olive-greens, all lighter than the board so they read on
+    // the dark DMG background (no piece equals board.bg).
+    colors: {
+      I: '#9bbc0f', O: '#8bac0f', T: '#aacf0f', S: '#6b9b0f',
+      Z: '#88a838', J: '#4f7a1e', L: '#c4d860',
+    },
+    board: { bg: '#0f2f0f', grid: '#1e4d1e' },
+  },
+};
+
+export const DEFAULT_THEME_ID = 'classic';
+
+export function getTheme(id) {
+  return THEMES[id] || THEMES[DEFAULT_THEME_ID];
+}
+
+export function themeIds() {
+  return Object.keys(THEMES);
+}
