@@ -39,6 +39,7 @@ const state = {
   lastDrop: 0,
   lockTimer: 0,
   paused: false,
+  settingsOpen: false,
   gameOver: false,
   cell: 30,
   previewCell: 24,
@@ -229,6 +230,7 @@ function setTheme(id) {
     renderNext();
     renderHold();
   }
+  closeSettings();
 }
 
 // The settings menu opens paused: it mirrors togglePause's pause branch so the
@@ -239,10 +241,12 @@ function openSettings() {
     state.paused = true;
     audio.pauseForGame();
   }
+  state.settingsOpen = true;
   showSettings();
 }
 
 function closeSettings() {
+  state.settingsOpen = false;
   hideSettings();
   if (state.paused) {
     state.paused = false;
@@ -351,7 +355,11 @@ export function start() {
     rotate: withTurn(tryRotate),
     hardDrop: withTurn(hardDrop),
     hold: withTurn(holdAction),
-    pause: togglePause,
+    pause: () => { if (state.settingsOpen) return; togglePause(); },
+    escape: () => {
+      if (state.settingsOpen) { closeSettings(); return; }
+      togglePause();
+    },
     restart: () => { if (state.gameOver) reset(); },
     toggleMusic: () => audio.toggle(),
   });

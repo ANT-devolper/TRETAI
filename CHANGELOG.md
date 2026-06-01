@@ -255,3 +255,17 @@ over overlay also shows a hint line ("Pressione Enter ou clique no botão") so t
 shortcut is discoverable; `#overlayHint` is toggled alongside the restart button
 (`withRestart`) in `showOverlay`/`hideOverlay`, so it only appears on game over —
 not on pause — asserted both visible (game over) and hidden (paused) in the spec.
+
+## 24. Pause key fix while the theme menu is open
+The settings menu opens the game paused, but the pause key stayed live: pressing
+`P`/`Esc` ran `togglePause` and resumed the game **behind** the still-open
+full-screen menu (`Esc` being the natural reflex to close a modal). Fixed by
+tracking `state.settingsOpen` in `game.js` and splitting `Escape` from `P` in the
+declarative `KEY_MAP` (`js/input.js`): `Escape` now maps to a new `escape` action.
+With the menu open, `P` is ignored and `Esc` closes the menu (resuming the game,
+like the Fechar button); with the menu closed both keep their previous
+pause/resume behavior. Selecting a theme now also closes the menu and resumes
+(`setTheme` calls `closeSettings`). Covered by three new `e2e/theme.spec.js` specs
+(Esc closes + resumes, P ignored while open, selecting a theme closes + resumes —
+red before the change, green after); the existing `pause.spec.js` and
+menu-close/theme-switch specs stay green.

@@ -83,7 +83,7 @@ TRETAI/
   - Reduced volume (duck) on game over.
   - Armed after first interaction due to autoplay policy.
   - Mute via `M` is session-only; reload always starts armed.
-- **Theme switcher**: a settings gear (⚙) floating in the viewport's top-right corner pauses the game and opens a menu to pick a theme. Themes available: **Clássico** (the original cyan-on-black look), **Game Boy** (monochrome DMG green), **Neon** (synthwave), **Sunset** (vaporwave) and **Pastel** (light mode). Switching repaints both the canvas (piece colors + board background/grid, plus a per-theme ghost color so it stays visible on light boards) and the whole DOM (panel/background accents); the choice persists across reloads.
+- **Theme switcher**: a settings gear (⚙) floating in the viewport's top-right corner pauses the game and opens a menu to pick a theme. Themes available: **Clássico** (the original cyan-on-black look), **Game Boy** (monochrome DMG green), **Neon** (synthwave), **Sunset** (vaporwave) and **Pastel** (light mode). Switching repaints both the canvas (piece colors + board background/grid, plus a per-theme ghost color so it stays visible on light boards) and the whole DOM (panel/background accents); the choice persists across reloads. While the menu is open the game stays paused: `P` is ignored, `Esc` closes the menu (resuming the game, like the Fechar button), and selecting a theme also closes the menu and resumes.
 
 ### Controls
 

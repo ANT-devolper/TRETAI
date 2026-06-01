@@ -125,4 +125,37 @@ test.describe('Theme switcher', () => {
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('#score')).toHaveText('1');
   });
+
+  test('Esc closes the menu and resumes the game', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#settingsBtn').click();
+    await expect(page.locator('#settingsMenu')).toHaveClass(/show/);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#settingsMenu')).not.toHaveClass(/show/);
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('1');
+  });
+
+  test('P is ignored while the menu is open', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#settingsBtn').click();
+    await expect(page.locator('#settingsMenu')).toHaveClass(/show/);
+
+    // P must neither close the menu nor resume the game.
+    await page.keyboard.press('p');
+    await expect(page.locator('#settingsMenu')).toHaveClass(/show/);
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('0');
+  });
+
+  test('selecting a theme closes the menu and resumes the game', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#settingsBtn').click();
+    await page.locator('.theme-option[data-theme="neon"]').click();
+
+    await expect(page.locator('#settingsMenu')).not.toHaveClass(/show/);
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('1');
+  });
 });
