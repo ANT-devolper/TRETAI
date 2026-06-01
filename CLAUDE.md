@@ -176,7 +176,7 @@ D. **Definition of Done** — a change is done only when all of these hold:
 
 ### Tests
 
-22. **Every pure function needs a unit test.** New behavior in `piece.js`, `board.js`, `scoring.js`, `resize.js` requires a matching case under `tests/`.
+22. **Every pure function needs a unit test.** New behavior in any module of the Pure layer (`piece.js`, `bag.js`, `board.js`, `scoring.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`) requires a matching case under `tests/`. The lone exception is `render.js`: it is pure but draws to a canvas, so its output is verified by E2E pixel-sampling specs (rule 23) rather than unit tests.
 23. **DOM, audio and integration → E2E.** Do not try to emulate DOM in Node; use Playwright under `e2e/` for real flows.
 24. **Test behavior, not implementation.** Assertions on input→output or observable state (DOM, `localStorage`); never on internal module details.
 25. **Refactor for testability when useful.** If a pure function gets trapped behind side effects, extract the pure part to accept parameters (e.g., `computeLayout(vw, vh)`).
