@@ -43,10 +43,12 @@ export const THEMES = {
     id: 'pastel',
     name: 'Pastel',
     colors: {
-      I: '#4fb3c4', O: '#d4a72c', T: '#9b6fd4', S: '#4fb36a',
-      Z: '#d45f5f', J: '#5f7fd4', L: '#d4894f',
+      I: '#8ed1d6', O: '#f3d77f', T: '#c3a6e0', S: '#9ad8a8',
+      Z: '#f29a98', J: '#a3b8e8', L: '#f0b780',
     },
-    board: { bg: '#f4f1ea', grid: '#ddd6c8' },
+    // Soft cool-gray board (no harsh white); each cell still gets a black border
+    // from paintBevelCell, so the light pastels stay readable.
+    board: { bg: '#cdd2da', grid: '#bcc2cc' },
     // Light board — the ghost must be dark to stay visible (others default to white).
     ghost: '#3a3450',
   },

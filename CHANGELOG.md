@@ -227,8 +227,9 @@ a deep plum board with an orange accent. Same pure pattern as Neon — a
 data-driven board-pixel E2E (red for `sunset` before the entry, green after).
 
 ## 22. Pastel theme (light) + themeable ghost
-A fifth theme, **Pastel**, is the first **light** palette: muted pieces over a cream
-board with a lavender accent and dark text. The light board exposed a hard-coded
+A fifth theme, **Pastel**, is the first **light** palette: a soft pastel piece set
+over a gentle cool-gray board (no harsh white) with a lavender accent and dark text.
+The light board exposed a hard-coded
 assumption — `drawGhost` in `js/render.js` painted the ghost in fixed
 `rgba(255,255,255,…)` white, invisible on a light background. `drawGhost` now takes
 a `ghostColor` (default `#fff`, applied via `globalAlpha` inside a `save()/restore()`

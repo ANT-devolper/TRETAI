@@ -45,14 +45,14 @@ html[data-theme="sunset"] {
 }
 
 html[data-theme="pastel"] {
-  --accent: #8a7bd8;
-  --accent-hover: #7568c4;
-  --bg-page: #e8e4dc;
-  --bg-game: #f4f1ea;
-  --bg-box: #ffffff;
-  --border: #d8d2c4;
-  --text: #3a3450;
-  --label: #8a8398;
+  --accent: #8f7fd6;
+  --accent-hover: #7a68c4;
+  --bg-page: #bcc2cc;
+  --bg-game: #cdd2da;
+  --bg-box: #dde1e8;
+  --border: #aeb5c1;
+  --text: #3c4254;
+  --label: #707888;
 }
 
 html, body {
