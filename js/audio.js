@@ -1,7 +1,9 @@
 import {
   DEFAULT_VOLUME, DUCK_VOLUME,
   SFX_VOLUME, LINE_CLEAR_NOTES,
+  COMBO_MIN_TO_SHOW, COMBO_TONE_DURATION,
 } from './constants.js';
+import { comboToneFreq } from './combo.js';
 import { read as readVolume, clampVolume } from './volume.js';
 
 let audioEl = null;
@@ -131,4 +133,14 @@ export function playLineClearSfx(lines) {
   for (const [freq, offset, duration] of notes) {
     playTone(ctx, freq, now + offset, duration);
   }
+}
+
+export function playComboSfx(combo) {
+  // Extra tone stacked on top of the line-clear SFX, rising in pitch per link.
+  // Like playLineClearSfx, it ignores userPaused so muting the music keeps it.
+  if (combo < COMBO_MIN_TO_SHOW) return;
+  const ctx = getSfxCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  playTone(ctx, comboToneFreq(combo), ctx.currentTime, COMBO_TONE_DURATION);
 }

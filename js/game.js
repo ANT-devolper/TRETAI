@@ -1,13 +1,17 @@
 import {
   COLS, ROWS, WALL_KICKS, LOCK_DELAY,
   PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
+  COMBO_MIN_TO_SHOW, COMBO_TEXT_DURATION,
+  COMBO_SHAKE_BASE, COMBO_SHAKE_PER_LEVEL, COMBO_SHAKE_MAX, COMBO_SHAKE_DURATION,
 } from './constants.js';
 import { makePiece, rotate } from './piece.js';
 import { nextType } from './bag.js';
 import { newBoard, collides, merge, clearLines, computeGhostY } from './board.js';
 import { lineScore, levelFromScore, dropIntervalForLevel } from './scoring.js';
+import { advanceCombo, comboBonus, comboParticleCount } from './combo.js';
 import {
   drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview, drawParticles, drawTrails,
+  drawComboBanner,
 } from './render.js';
 import { createBurst, stepParticles } from './particles.js';
 import { createDropTrail, stepTrails } from './trails.js';
@@ -45,11 +49,22 @@ const state = {
   previewCell: 24,
   particles: [],
   trails: [],
+  combo: 0,
+  comboFx: null,
+  shake: null,
   lastFrame: 0,
   theme: getTheme(),
 };
 
 function renderBoard() {
+  // Pinta o fundo cheio antes do shake para o translate não expor borda vazia.
+  ctx.fillStyle = state.theme.board.bg;
+  ctx.fillRect(0, 0, dom.canvas.width, dom.canvas.height);
+  ctx.save();
+  if (state.shake) {
+    const amp = state.shake.mag * Math.max(0, state.shake.life / state.shake.maxLife);
+    ctx.translate((Math.random() * 2 - 1) * amp, (Math.random() * 2 - 1) * amp);
+  }
   drawGrid(ctx, dom.canvas, state.cell, state.theme.board.bg, state.theme.board.grid);
   drawLockedCells(ctx, state.board, state.cell, state.theme.colors);
   drawTrails(ctx, state.trails);
@@ -59,10 +74,14 @@ function renderBoard() {
     drawPiece(ctx, state.current, state.cell, state.theme.colors);
   }
   drawParticles(ctx, state.particles);
+  ctx.restore();
+  // Banner fica fora do shake para o texto permanecer legível.
+  if (state.comboFx) drawComboBanner(ctx, dom.canvas, state.comboFx);
 }
 
 function emitLineClearParticles(rows) {
-  const perCell = PARTICLES_PER_CELL[rows.length] || 0;
+  const base = PARTICLES_PER_CELL[rows.length] || 0;
+  const perCell = comboParticleCount(base, state.combo);
   if (!perCell) return;
   const minSize = state.cell * PARTICLE_MIN_SIZE;
   const maxSize = state.cell * PARTICLE_MAX_SIZE;
@@ -76,6 +95,16 @@ function emitLineClearParticles(rows) {
       for (const p of burst) state.particles.push(p);
     }
   }
+}
+
+// Dispara o banner pulsante e o screen shake, com amplitude crescente no combo.
+function triggerComboFx(combo) {
+  state.comboFx = { combo, life: COMBO_TEXT_DURATION, maxLife: COMBO_TEXT_DURATION };
+  const mag = Math.min(
+    COMBO_SHAKE_BASE + (combo - COMBO_MIN_TO_SHOW) * COMBO_SHAKE_PER_LEVEL,
+    COMBO_SHAKE_MAX,
+  );
+  state.shake = { mag, life: COMBO_SHAKE_DURATION, maxLife: COMBO_SHAKE_DURATION };
 }
 
 function renderNext() {
@@ -155,10 +184,15 @@ function lockPiece() {
     }
   }
   const cleared = clearLines(state.board);
+  state.combo = advanceCombo(state.combo, cleared);
   if (cleared > 0) {
-    applyScore(lineScore(cleared, state.level), cleared);
+    applyScore(lineScore(cleared, state.level) + comboBonus(state.combo, state.level), cleared);
     audio.playLineClearSfx(cleared);
     emitLineClearParticles(fullRows);
+    if (state.combo >= COMBO_MIN_TO_SHOW) {
+      triggerComboFx(state.combo);
+      audio.playComboSfx(state.combo);
+    }
   }
   if (!state.gameOver) spawn();
 }
@@ -311,6 +345,14 @@ function loop(time) {
     }
     if (state.particles.length) state.particles = stepParticles(state.particles, dt);
     if (state.trails.length) state.trails = stepTrails(state.trails, dt);
+    if (state.comboFx) {
+      state.comboFx.life -= dt;
+      if (state.comboFx.life <= 0) state.comboFx = null;
+    }
+    if (state.shake) {
+      state.shake.life -= dt;
+      if (state.shake.life <= 0) state.shake = null;
+    }
     renderBoard();
   }
   requestAnimationFrame(loop);
@@ -327,6 +369,9 @@ function reset() {
   state.lastFrame = 0;
   state.particles = [];
   state.trails = [];
+  state.combo = 0;
+  state.comboFx = null;
+  state.shake = null;
   state.paused = false;
   state.gameOver = false;
   state.hold = null;

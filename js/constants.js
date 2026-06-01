@@ -62,6 +62,29 @@ export const TRAIL_DURATION = 0.2;
 export const TRAIL_ALPHA_START = 0.3;
 export const TRAIL_WHITE_ALPHA = 0.2;
 
+// Combo: locks consecutivos que limpam linhas. Conta a partir de ×2.
+export const COMBO_MIN_TO_SHOW = 2;
+export const COMBO_BONUS_PER_LEVEL = 50; // bônus = 50 × (combo-1) × level
+// Partículas turbinadas: multiplica a contagem por célula conforme o combo.
+export const COMBO_PARTICLE_BOOST = 0.5; // +50% por elo acima de ×1
+export const COMBO_PARTICLE_MAX = 40;    // teto de segurança por célula
+// Banner "COMBO ×N": vida, pulso e escala máxima do texto.
+export const COMBO_TEXT_DURATION = 0.9;  // segundos
+export const COMBO_TEXT_PULSE_HZ = 6;    // oscilações de escala por segundo
+export const COMBO_TEXT_MAX_SCALE = 0.18; // amplitude do pulso (fração)
+// Screen shake: amplitude (px) cresce com o combo, com teto e duração própria.
+export const COMBO_SHAKE_BASE = 4;
+export const COMBO_SHAKE_PER_LEVEL = 2;
+export const COMBO_SHAKE_MAX = 14;
+export const COMBO_SHAKE_DURATION = 0.35; // segundos
+// Flash de cor cobrindo o tabuleiro no disparo do combo.
+export const COMBO_FLASH_ALPHA = 0.25;
+// Tom ascendente extra (Web Audio square-wave), sobe por elo até o teto.
+export const COMBO_TONE_BASE = 392;      // G4 em Hz
+export const COMBO_TONE_SEMITONES = 2;   // tom inteiro por elo
+export const COMBO_TONE_MAX_STEPS = 6;   // satura após 6 elos
+export const COMBO_TONE_DURATION = 0.18; // segundos
+
 export const SFX_VOLUME = 0.18;
 // [frequência Hz, offset segundos, duração segundos] — escala C maior, ascendente.
 // 4 linhas (tetris) acrescenta um C6 sustentado para soar triunfante.

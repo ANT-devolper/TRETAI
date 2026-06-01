@@ -1,4 +1,7 @@
-import { COLS, ROWS, TRAIL_ALPHA_START, TRAIL_WHITE_ALPHA } from './constants.js';
+import {
+  COLS, ROWS, TRAIL_ALPHA_START, TRAIL_WHITE_ALPHA,
+  COMBO_FLASH_ALPHA, COMBO_TEXT_MAX_SCALE, COMBO_TEXT_PULSE_HZ,
+} from './constants.js';
 
 function paintBevelCell(ctx, color, px, py, size, bevel) {
   ctx.fillStyle = color;
@@ -99,6 +102,42 @@ export function drawParticles(ctx, particles) {
     const half = p.size / 2;
     ctx.fillRect(p.x - half, p.y - half, p.size, p.size);
   }
+  ctx.restore();
+}
+
+// Cor do combo: o matiz avança a cada elo, do verde-limão ao quente.
+function comboColor(combo) {
+  return `hsl(${(combo * 40) % 360}, 100%, 60%)`;
+}
+
+// Banner "COMBO ×N" + flash, desenhado sobre o tabuleiro. fx = { combo, life, maxLife }.
+export function drawComboBanner(ctx, canvas, fx) {
+  const { combo, life, maxLife } = fx;
+  const t = Math.max(0, Math.min(1, life / maxLife)); // 1 → 0 ao longo da vida
+  const color = comboColor(combo);
+
+  ctx.save();
+  ctx.globalAlpha = COMBO_FLASH_ALPHA * t;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  const age = maxLife - life;
+  const pulse = 1 + COMBO_TEXT_MAX_SCALE * Math.sin(age * COMBO_TEXT_PULSE_HZ * Math.PI * 2);
+  const size = canvas.width * 0.16 * pulse;
+  ctx.save();
+  ctx.globalAlpha = t;
+  ctx.font = `bold ${size}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(2, size * 0.06);
+  ctx.strokeStyle = '#000';
+  ctx.fillStyle = color;
+  const cx = canvas.width / 2;
+  const cy = canvas.height * 0.32;
+  const label = `COMBO ×${combo}`;
+  ctx.strokeText(label, cx, cy);
+  ctx.fillText(label, cx, cy);
   ctx.restore();
 }
 
