@@ -45,19 +45,23 @@ export function drawLockedCells(ctx, board, cell, colors) {
   }
 }
 
-export function drawGhost(ctx, piece, ghostY, cell) {
+export function drawGhost(ctx, piece, ghostY, cell, ghostColor = '#fff') {
+  ctx.save();
+  ctx.fillStyle = ghostColor;
+  ctx.strokeStyle = ghostColor;
   for (let r = 0; r < piece.shape.length; r++) {
     for (let c = 0; c < piece.shape[r].length; c++) {
       if (piece.shape[r][c]) {
         const x = (piece.x + c) * cell;
         const y = (piece.y + r + ghostY) * cell;
-        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.globalAlpha = 0.1;
         ctx.fillRect(x, y, cell, cell);
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.globalAlpha = 0.3;
         ctx.strokeRect(x, y, cell, cell);
       }
     }
   }
+  ctx.restore();
 }
 
 export function drawPiece(ctx, piece, cell, colors) {

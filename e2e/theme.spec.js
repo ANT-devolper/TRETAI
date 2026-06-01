@@ -73,6 +73,7 @@ test.describe('Theme switcher', () => {
   const EXTRA_THEME_BG = {
     neon: [21, 10, 40], // #150a28
     sunset: [36, 16, 48], // #241030
+    pastel: [244, 241, 234], // #f4f1ea
   };
   for (const [id, bg] of Object.entries(EXTRA_THEME_BG)) {
     test(`selecting the ${id} theme repaints the board background`, async ({ page }) => {
@@ -88,6 +89,32 @@ test.describe('Theme switcher', () => {
       expect(px).toEqual(bg);
     });
   }
+
+  test('the ghost stays dark and visible on the light Pastel theme', async ({ page }) => {
+    // Fixed bag order so the first piece (and thus the ghost columns) is deterministic.
+    await page.addInitScript(() => { Math.random = () => 0; });
+    await page.goto('/');
+    await page.locator('#settingsBtn').click();
+    await page.locator('.theme-option[data-theme="pastel"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'pastel');
+
+    const { ghost, bg } = await page.evaluate(() => {
+      const c = document.getElementById('board');
+      const cell = c.width / 10;
+      const ctx = c.getContext('2d');
+      const at = (cx, cy) => {
+        const d = ctx.getImageData(Math.floor(cx), Math.floor(cy), 1, 1).data;
+        return [d[0], d[1], d[2]];
+      };
+      // First piece is O (cols 4-5); its ghost lands on the bottom rows.
+      const ghost = at(4.5 * cell, 18.5 * cell);
+      // An untouched cell shows the plain light board background.
+      const bg = at(0.5 * cell, 0.5 * cell);
+      return { ghost, bg };
+    });
+    // A dark ghost darkens the light board; a white ghost (the bug) would not.
+    expect(ghost[0]).toBeLessThan(bg[0] - 5);
+  });
 
   test('closing the menu resumes the game', async ({ page }) => {
     await page.goto('/');

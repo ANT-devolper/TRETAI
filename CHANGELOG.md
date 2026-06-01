@@ -225,3 +225,17 @@ a deep plum board with an orange accent. Same pure pattern as Neon — a
 `THEMES.sunset` entry in `js/themes.js` and an `html[data-theme="sunset"]` block in
 `style.css`; covered by the already-generalized contrast unit guard and the
 data-driven board-pixel E2E (red for `sunset` before the entry, green after).
+
+## 22. Pastel theme (light) + themeable ghost
+A fifth theme, **Pastel**, is the first **light** palette: muted pieces over a cream
+board with a lavender accent and dark text. The light board exposed a hard-coded
+assumption — `drawGhost` in `js/render.js` painted the ghost in fixed
+`rgba(255,255,255,…)` white, invisible on a light background. `drawGhost` now takes
+a `ghostColor` (default `#fff`, applied via `globalAlpha` inside a `save()/restore()`
+so it doesn't leak alpha into the next draw) and `game.js` passes
+`state.theme.ghost`. Only `pastel` sets `ghost` (`#3a3450`); every other theme omits
+it and keeps the white ghost, so Clássico/Game Boy/Neon/Sunset are visually
+unchanged. Guarded by the generalized contrast unit test, the data-driven board-pixel
+E2E, and a new ghost-pixel E2E that fixes the bag order (`Math.random = () => 0`) and
+asserts the ghost darkens the light Pastel board (red with the old white ghost, green
+after threading the theme color).

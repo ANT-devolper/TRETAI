@@ -39,6 +39,17 @@ export const THEMES = {
     },
     board: { bg: '#241030', grid: '#43204d' },
   },
+  pastel: {
+    id: 'pastel',
+    name: 'Pastel',
+    colors: {
+      I: '#4fb3c4', O: '#d4a72c', T: '#9b6fd4', S: '#4fb36a',
+      Z: '#d45f5f', J: '#5f7fd4', L: '#d4894f',
+    },
+    board: { bg: '#f4f1ea', grid: '#ddd6c8' },
+    // Light board — the ghost must be dark to stay visible (others default to white).
+    ghost: '#3a3450',
+  },
 };
 
 export const DEFAULT_THEME_ID = 'classic';

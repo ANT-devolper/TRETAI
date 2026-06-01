@@ -44,6 +44,17 @@ html[data-theme="sunset"] {
   --label: #c98fb0;
 }
 
+html[data-theme="pastel"] {
+  --accent: #8a7bd8;
+  --accent-hover: #7568c4;
+  --bg-page: #e8e4dc;
+  --bg-game: #f4f1ea;
+  --bg-box: #ffffff;
+  --border: #d8d2c4;
+  --text: #3a3450;
+  --label: #8a8398;
+}
+
 html, body {
   height: 100%;
   width: 100%;

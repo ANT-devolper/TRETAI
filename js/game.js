@@ -54,7 +54,7 @@ function renderBoard() {
   drawTrails(ctx, state.trails);
   if (state.current && !state.gameOver) {
     const ghostY = computeGhostY(state.board, state.current);
-    drawGhost(ctx, state.current, ghostY, state.cell);
+    drawGhost(ctx, state.current, ghostY, state.cell, state.theme.ghost);
     drawPiece(ctx, state.current, state.cell, state.theme.colors);
   }
   drawParticles(ctx, state.particles);
