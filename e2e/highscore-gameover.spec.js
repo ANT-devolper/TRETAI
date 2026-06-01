@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 import { mockAudio } from './audio-mock.js';
 
 async function setup(page, { record = 0 } = {}) {

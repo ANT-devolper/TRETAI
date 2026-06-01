@@ -39,6 +39,7 @@ TRETAI/
 │   ├── trails.js           # createDropTrail, stepTrails (pure) — hard-drop trail effect
 │   ├── themes.js           # THEMES data + getTheme/themeIds (pure) — palettes
 │   ├── theme.js            # selected-theme persistence (localStorage) + clampThemeId
+│   ├── visited.js          # first-visit flag persistence (localStorage)
 │   └── game.js             # orchestrator: mutable state + loop + wiring
 ├── tests/                  # unit (node --test)
 │   ├── piece.test.js
@@ -51,6 +52,7 @@ TRETAI/
 │   └── themes.test.js
 └── e2e/                    # Playwright
     ├── audio-mock.js       # helper: replaces window.Audio with MockAudio
+    ├── fixtures.js         # helper: test/expect that seed the visited flag
     ├── smoke.spec.js
     ├── gameplay.spec.js
     ├── pause.spec.js
@@ -58,13 +60,14 @@ TRETAI/
     ├── persistence.spec.js
     ├── layout.spec.js
     ├── hard-drop-trail.spec.js
+    ├── tutorial.spec.js
     └── theme.spec.js
 ```
 
 ### Layers
 
 - **Pure** (no state, no DOM): `piece.js`, `bag.js`, `board.js`, `scoring.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`.
-- **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners), `theme.js`/`highscore.js`/`volume.js` (localStorage).
+- **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners), `theme.js`/`highscore.js`/`volume.js`/`visited.js` (localStorage).
 - **Orchestration**: `game.js` is the only module with mutable game state. `audio.js` keeps its own encapsulated state.
 - **Bootstrap**: `main.js`.
 
@@ -83,6 +86,7 @@ TRETAI/
   - Reduced volume (duck) on game over.
   - Armed after first interaction due to autoplay policy.
   - Mute via `M` is session-only; reload always starts armed.
+- **First-visit tutorial**: on the very first visit (no `tretai.visited` flag in `localStorage`) a "Como jogar" welcome screen — a full-screen modal mirroring the theme menu — opens with the game paused, listing the essential controls and the goal, plus a "Começar a jogar" button. Clicking it or pressing `Esc` dismisses the modal, marks the visit, and starts play. It never reappears afterwards (the panel's "Controles" box stays as the permanent reference).
 - **Theme switcher**: a settings gear (⚙) floating in the viewport's top-right corner pauses the game and opens a menu to pick a theme. Themes available: **Clássico** (the original cyan-on-black look), **Game Boy** (monochrome DMG green), **Neon** (synthwave), **Sunset** (vaporwave) and **Pastel** (light mode). Switching repaints both the canvas (piece colors + board background/grid, plus a per-theme ghost color so it stays visible on light boards) and the whole DOM (panel/background accents); the choice persists across reloads. While the menu is open the game stays paused: `P` is ignored, `Esc` closes the menu (resuming the game, like the Fechar button), and selecting a theme also closes the menu and resumes.
 
 ### Controls

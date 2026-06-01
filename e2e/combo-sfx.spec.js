@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 import { mockAudio } from './audio-mock.js';
 
 // O som extra de combo (playComboSfx) é um oscilador square-wave somado ao SFX

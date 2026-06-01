@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 
 test.describe('Pause', () => {
   test('P shows the PAUSADO overlay and blocks inputs', async ({ page }) => {

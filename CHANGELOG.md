@@ -269,3 +269,19 @@ pause/resume behavior. Selecting a theme now also closes the menu and resumes
 (Esc closes + resumes, P ignored while open, selecting a theme closes + resumes —
 red before the change, green after); the existing `pause.spec.js` and
 menu-close/theme-switch specs stay green.
+
+## 25. First-visit tutorial
+Playtesting with people who had never played Tetris showed they struggled to
+discover the controls (the panel's "Controles" box went unnoticed). A "Como
+jogar" welcome screen now appears automatically on the first visit only — a
+full-screen modal mirroring the theme menu that lists the essential controls
+(move, drop, rotate, hard drop, hold) plus the goal, with a "Começar a jogar"
+button. The game stays paused behind it; clicking the button or pressing `Esc`
+dismisses it and starts play. First visit is detected with a new
+`tretai.visited` localStorage flag via the new `js/visited.js` module (same
+defensive `try/catch` as `theme.js`/`volume.js`); once set, the tutorial never
+reappears and the panel list remains the permanent reference. Covered by
+`e2e/tutorial.spec.js` (shown on first visit, dismissed by button/`Esc`, not
+shown when the flag is set — red before the change, green after). A new
+`e2e/fixtures.js` seeds the visited flag for all other specs so they keep
+landing on a playable board.

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 
 test.describe('Smoke', () => {
   test('page loads with canvas and zeroed counters', async ({ page }) => {

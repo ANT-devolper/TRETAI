@@ -18,7 +18,7 @@ import { createDropTrail, stepTrails } from './trails.js';
 import {
   dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
   renderVolume, measurePanelNaturalHeight, applyPanelScale,
-  applyTheme, renderThemeOptions, showSettings, hideSettings,
+  applyTheme, renderThemeOptions, showSettings, hideSettings, showTutorial, hideTutorial,
 } from './ui.js';
 import { computeLayout, scaleToFit } from './resize.js';
 import { bindKeyboard } from './input.js';
@@ -26,6 +26,7 @@ import * as audio from './audio.js';
 import * as highscore from './highscore.js';
 import * as volume from './volume.js';
 import * as theme from './theme.js';
+import * as visited from './visited.js';
 import { getTheme, THEMES, themeIds } from './themes.js';
 
 const state = {
@@ -44,6 +45,7 @@ const state = {
   lockTimer: 0,
   paused: false,
   settingsOpen: false,
+  tutorialOpen: false,
   gameOver: false,
   cell: 30,
   previewCell: 24,
@@ -289,6 +291,24 @@ function closeSettings() {
   }
 }
 
+// First-visit welcome screen: opens paused (like the settings menu) so new
+// players can read the controls before the game starts dropping.
+function openTutorial() {
+  state.paused = true;
+  audio.pauseForGame();
+  state.tutorialOpen = true;
+  showTutorial();
+}
+
+function closeTutorial() {
+  state.tutorialOpen = false;
+  visited.markVisited();
+  hideTutorial();
+  state.paused = false;
+  audio.resumeForGame();
+  state.lastDrop = 0;
+}
+
 function withTurn(action) {
   return () => {
     if (state.paused || state.gameOver) return;
@@ -400,8 +420,9 @@ export function start() {
     rotate: withTurn(tryRotate),
     hardDrop: withTurn(hardDrop),
     hold: withTurn(holdAction),
-    pause: () => { if (state.settingsOpen) return; togglePause(); },
+    pause: () => { if (state.tutorialOpen || state.settingsOpen) return; togglePause(); },
     escape: () => {
+      if (state.tutorialOpen) { closeTutorial(); return; }
       if (state.settingsOpen) { closeSettings(); return; }
       togglePause();
     },
@@ -412,6 +433,7 @@ export function start() {
   dom.restartBtn.addEventListener('click', reset);
   dom.settingsBtn.addEventListener('click', openSettings);
   dom.settingsClose.addEventListener('click', closeSettings);
+  dom.tutorialStart.addEventListener('click', closeTutorial);
   dom.musicBtn.addEventListener('click', () => audio.toggle());
   const initialVolume = volume.read();
   audio.setVolume(initialVolume);
@@ -423,5 +445,6 @@ export function start() {
   });
   audio.onStateChange(renderMusicState);
   renderMusicState({ playing: audio.isPlaying() });
+  if (!visited.read()) openTutorial();
   requestAnimationFrame(loop);
 }

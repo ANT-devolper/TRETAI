@@ -19,6 +19,8 @@ export const dom = {
   settingsMenu: document.getElementById('settingsMenu'),
   settingsClose: document.getElementById('settingsClose'),
   themeOptions: document.getElementById('themeOptions'),
+  tutorial: document.getElementById('tutorial'),
+  tutorialStart: document.getElementById('tutorialStart'),
 };
 
 export const ctx = dom.canvas.getContext('2d');
@@ -113,4 +115,12 @@ export function showSettings() {
 
 export function hideSettings() {
   dom.settingsMenu.classList.remove('show');
+}
+
+export function showTutorial() {
+  dom.tutorial.classList.add('show');
+}
+
+export function hideTutorial() {
+  dom.tutorial.classList.remove('show');
 }

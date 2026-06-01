@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 
 const sampleMidBoardBrightness = () => {
   const canvas = document.getElementById('board');

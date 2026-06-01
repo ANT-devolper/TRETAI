@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 import { mockAudio } from './audio-mock.js';
 
 // Muting the lofi music with M must never silence the line-clear sound effects:
