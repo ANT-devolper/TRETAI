@@ -21,6 +21,9 @@ export const SHAPES = {
 };
 
 export const SCORE_TABLE = [0, 100, 300, 500, 800];
+// Perfect Clear (tabuleiro vazio após o lock): bônus por linhas × level, indexado
+// como SCORE_TABLE. Valores clássicos do Tetris guideline.
+export const PERFECT_CLEAR_BONUS = [0, 800, 1200, 1800, 2000];
 export const WALL_KICKS = [0, -1, 1, -2, 2];
 
 export const LOCK_DELAY = 500;

@@ -1,5 +1,6 @@
 import {
   SCORE_TABLE,
+  PERFECT_CLEAR_BONUS,
   MAX_LEVEL,
   LEVEL_SCORE_THRESHOLDS,
   LEVEL_DROP_INTERVALS,
@@ -7,6 +8,10 @@ import {
 
 export function lineScore(cleared, level) {
   return SCORE_TABLE[cleared] * level;
+}
+
+export function perfectClearBonus(cleared, level) {
+  return (PERFECT_CLEAR_BONUS[cleared] || 0) * level;
 }
 
 export function levelFromScore(score) {

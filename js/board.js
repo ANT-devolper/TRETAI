@@ -47,3 +47,7 @@ export function computeGhostY(board, piece) {
   while (!collides(board, piece, 0, ghostY + 1)) ghostY++;
   return ghostY;
 }
+
+export function isBoardEmpty(board) {
+  return board.every(row => row.every(cell => !cell));
+}

@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { lineScore, levelFromScore, dropIntervalForLevel } from '../js/scoring.js';
+import { lineScore, levelFromScore, dropIntervalForLevel, perfectClearBonus } from '../js/scoring.js';
 
 describe('lineScore', () => {
   test('applies the [0,100,300,500,800] × level table', () => {
@@ -66,5 +66,25 @@ describe('dropIntervalForLevel', () => {
   test('caps at the level 8 value for levels above the cap', () => {
     assert.equal(dropIntervalForLevel(9), 150);
     assert.equal(dropIntervalForLevel(99), 150);
+  });
+});
+
+describe('perfectClearBonus', () => {
+  test('applies the [0,800,1200,1800,2000] × level table at level 1', () => {
+    assert.equal(perfectClearBonus(1, 1), 800);
+    assert.equal(perfectClearBonus(2, 1), 1200);
+    assert.equal(perfectClearBonus(3, 1), 1800);
+    assert.equal(perfectClearBonus(4, 1), 2000);
+  });
+
+  test('scales with level', () => {
+    assert.equal(perfectClearBonus(4, 5), 10000);
+    assert.equal(perfectClearBonus(1, 8), 6400);
+    assert.equal(perfectClearBonus(2, 3), 3600);
+  });
+
+  test('returns 0 outside the 1..4 cleared range', () => {
+    assert.equal(perfectClearBonus(0, 5), 0);
+    assert.equal(perfectClearBonus(5, 5), 0);
   });
 });

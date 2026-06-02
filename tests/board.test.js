@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { newBoard, collides, merge, clearLines, computeGhostY } from '../js/board.js';
+import { newBoard, collides, merge, clearLines, computeGhostY, isBoardEmpty } from '../js/board.js';
 import { COLS, ROWS } from '../js/constants.js';
 
 describe('newBoard', () => {
@@ -138,5 +138,26 @@ describe('computeGhostY', () => {
     const board = newBoard();
     const piece = { x: 0, y: ROWS - 1, shape: [[1]] };
     assert.equal(computeGhostY(board, piece), 0);
+  });
+});
+
+describe('isBoardEmpty', () => {
+  test('returns true for a fresh board', () => {
+    assert.equal(isBoardEmpty(newBoard()), true);
+  });
+
+  test('returns false when any cell is occupied', () => {
+    const board = newBoard();
+    board[ROWS - 1][COLS - 1] = 'L';
+    assert.equal(isBoardEmpty(board), false);
+  });
+
+  test('returns true after clearLines empties the whole board', () => {
+    const board = newBoard();
+    for (let r = ROWS - 2; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) board[r][c] = 'O';
+    }
+    clearLines(board);
+    assert.equal(isBoardEmpty(board), true);
   });
 });
