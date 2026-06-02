@@ -297,3 +297,17 @@ reappears and the panel list remains the permanent reference. Covered by
 shown when the flag is set — red before the change, green after). A new
 `e2e/fixtures.js` seeds the visited flag for all other specs so they keep
 landing on a playable board.
+
+## 27. Perfect Clear
+Clearing lines so the board ends up completely empty now triggers a Perfect
+Clear — the most prestigious Tetris reward, previously unrewarded. It grants a
+classic bonus on top of the line/combo score (1→800, 2→1200, 3→1800, 4→2000,
+all `× level`), a golden pulsing "PERFECT CLEAR" banner over the board, and a
+triumphant ascending C-major arpeggio layered on the line-clear SFX. Pure logic
+is split as usual: `isBoardEmpty(board)` in `board.js` detects the empty board
+after the clear, and `perfectClearBonus(cleared, level)` in `scoring.js` reads
+the new `PERFECT_CLEAR_BONUS` table — both unit-tested (red before, green after).
+The banner (`drawPerfectClearBanner`, mirroring `drawComboBanner`) and the SFX
+(`playPerfectClearSfx`, mirroring `playLineClearSfx`) are verified by
+`e2e/perfect-clear.spec.js` via pixel-sampling and oscillator counting, since a
+real Perfect Clear is impractical to force from the keyboard.

@@ -1,6 +1,6 @@
 import {
   DEFAULT_VOLUME, DUCK_VOLUME,
-  SFX_VOLUME, LINE_CLEAR_NOTES,
+  SFX_VOLUME, LINE_CLEAR_NOTES, PERFECT_CLEAR_NOTES,
   COMBO_MIN_TO_SHOW, COMBO_TONE_DURATION,
 } from './constants.js';
 import { comboToneFreq } from './combo.js';
@@ -131,6 +131,18 @@ export function playLineClearSfx(lines) {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   const now = ctx.currentTime;
   for (const [freq, offset, duration] of notes) {
+    playTone(ctx, freq, now + offset, duration);
+  }
+}
+
+export function playPerfectClearSfx() {
+  // Triumphant arpeggio stacked on the line-clear SFX for a Perfect Clear.
+  // Like the other SFX, it ignores userPaused so muting the music keeps it.
+  const ctx = getSfxCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  const now = ctx.currentTime;
+  for (const [freq, offset, duration] of PERFECT_CLEAR_NOTES) {
     playTone(ctx, freq, now + offset, duration);
   }
 }

@@ -90,6 +90,19 @@ export const COMBO_TONE_SEMITONES = 2;   // tom inteiro por elo
 export const COMBO_TONE_MAX_STEPS = 6;   // satura após 6 elos
 export const COMBO_TONE_DURATION = 0.18; // segundos
 
+// Perfect Clear: banner dourado "PERFECT CLEAR" + flash, mais demorado que o
+// combo por ser a recompensa de maior prestígio.
+export const PC_TEXT_DURATION = 1.2;  // segundos
+export const PC_FLASH_ALPHA = 0.3;
+export const PC_COLOR = '#ffd700';     // dourado
+// Arpejo triunfante ascendente C maior (C5-E5-G5-C6), com C6 sustentado no fim.
+export const PERFECT_CLEAR_NOTES = [
+  [523.25, 0.00, 0.10],
+  [659.25, 0.08, 0.10],
+  [783.99, 0.16, 0.10],
+  [1046.50, 0.24, 0.40],
+];
+
 export const SFX_VOLUME = 0.18;
 // [frequência Hz, offset segundos, duração segundos] — escala C maior, ascendente.
 // 4 linhas (tetris) acrescenta um C6 sustentado para soar triunfante.

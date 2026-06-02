@@ -67,6 +67,7 @@ TRETAI/
     ├── layout.spec.js
     ├── hard-drop-trail.spec.js
     ├── combo-sfx.spec.js
+    ├── perfect-clear.spec.js
     ├── highscore.spec.js
     ├── highscore-gameover.spec.js
     ├── restart-enter.spec.js
@@ -91,6 +92,8 @@ TRETAI/
 - Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
 - Score, line count, level (speeds up `dropInterval`).
 - **Combo**: consecutive line-clearing locks build a combo, reset by any lock that clears nothing. From ×2 on it rewards the player with a classic bonus (`50 × (combo-1) × level` added to the line score), a pulsing "COMBO ×N" banner, growing screen shake + color flash, boosted line-clear particles, and an extra ascending square-wave tone layered on the line SFX. Pure logic lives in `combo.js` (`advanceCombo`, `comboBonus`, `comboParticleCount`, `comboToneFreq`).
+- **Perfect Clear**: a lock that clears lines and leaves the board completely empty triggers a Perfect Clear — a classic bonus on top of the line/combo score (`PERFECT_CLEAR_BONUS` table `1→800, 2→1200, 3→1800, 4→2000`, all `× level`), a golden pulsing "PERFECT CLEAR" banner, and a triumphant ascending arpeggio layered on the line SFX. Pure logic: `isBoardEmpty` (`board.js`) detects the empty board, `perfectClearBonus` (`scoring.js`) computes the reward.
+- Drop scoring: soft drop scores 1 point per cell descended, hard drop 2 points per cell (classic Tetris guideline), applied in `game.js`.
 - Pause and game over overlay with "Play again" button; on game over, `Enter` also restarts (no-op while a game is in progress) and the overlay shows a hint pointing to both ways to restart.
 - **No-scroll** layout (vertical/horizontal locked), adaptive to any viewport — `CELL` recomputed on `resize`.
 - Ambient lofi music via SomaFM Groove Salad stream with:

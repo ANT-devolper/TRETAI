@@ -1,6 +1,7 @@
 import {
   COLS, ROWS, TRAIL_ALPHA_START, TRAIL_WHITE_ALPHA,
   COMBO_FLASH_ALPHA, COMBO_TEXT_MAX_SCALE, COMBO_TEXT_PULSE_HZ,
+  PC_FLASH_ALPHA, PC_COLOR,
 } from './constants.js';
 
 function paintBevelCell(ctx, color, px, py, size, bevel) {
@@ -136,6 +137,37 @@ export function drawComboBanner(ctx, canvas, fx) {
   const cx = canvas.width / 2;
   const cy = canvas.height * 0.32;
   const label = `COMBO ×${combo}`;
+  ctx.strokeText(label, cx, cy);
+  ctx.fillText(label, cx, cy);
+  ctx.restore();
+}
+
+// Banner "PERFECT CLEAR" + flash dourado, desenhado sobre o tabuleiro.
+// fx = { life, maxLife }. Espelha drawComboBanner, com label e cor fixos.
+export function drawPerfectClearBanner(ctx, canvas, fx) {
+  const { life, maxLife } = fx;
+  const t = Math.max(0, Math.min(1, life / maxLife)); // 1 → 0 ao longo da vida
+
+  ctx.save();
+  ctx.globalAlpha = PC_FLASH_ALPHA * t;
+  ctx.fillStyle = PC_COLOR;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  const age = maxLife - life;
+  const pulse = 1 + COMBO_TEXT_MAX_SCALE * Math.sin(age * COMBO_TEXT_PULSE_HZ * Math.PI * 2);
+  const size = canvas.width * 0.11 * pulse;
+  ctx.save();
+  ctx.globalAlpha = t;
+  ctx.font = `bold ${size}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(2, size * 0.06);
+  ctx.strokeStyle = '#000';
+  ctx.fillStyle = PC_COLOR;
+  const cx = canvas.width / 2;
+  const cy = canvas.height * 0.32;
+  const label = 'PERFECT CLEAR';
   ctx.strokeText(label, cx, cy);
   ctx.fillText(label, cx, cy);
   ctx.restore();

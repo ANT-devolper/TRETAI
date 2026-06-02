@@ -3,15 +3,16 @@ import {
   PARTICLES_PER_CELL, PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE,
   COMBO_MIN_TO_SHOW, COMBO_TEXT_DURATION,
   COMBO_SHAKE_BASE, COMBO_SHAKE_PER_LEVEL, COMBO_SHAKE_MAX, COMBO_SHAKE_DURATION,
+  PC_TEXT_DURATION,
 } from './constants.js';
 import { makePiece, rotate } from './piece.js';
 import { nextType } from './bag.js';
-import { newBoard, collides, merge, clearLines, computeGhostY } from './board.js';
-import { lineScore, levelFromScore, dropIntervalForLevel } from './scoring.js';
+import { newBoard, collides, merge, clearLines, computeGhostY, isBoardEmpty } from './board.js';
+import { lineScore, levelFromScore, dropIntervalForLevel, perfectClearBonus } from './scoring.js';
 import { advanceCombo, comboBonus, comboParticleCount } from './combo.js';
 import {
   drawGrid, drawLockedCells, drawGhost, drawPiece, drawPiecePreview, drawParticles, drawTrails,
-  drawComboBanner,
+  drawComboBanner, drawPerfectClearBanner,
 } from './render.js';
 import { createBurst, stepParticles } from './particles.js';
 import { createDropTrail, stepTrails } from './trails.js';
@@ -53,6 +54,7 @@ const state = {
   trails: [],
   combo: 0,
   comboFx: null,
+  pcFx: null,
   shake: null,
   lastFrame: 0,
   theme: getTheme(),
@@ -77,8 +79,9 @@ function renderBoard() {
   }
   drawParticles(ctx, state.particles);
   ctx.restore();
-  // Banner fica fora do shake para o texto permanecer legível.
+  // Banners ficam fora do shake para o texto permanecer legível.
   if (state.comboFx) drawComboBanner(ctx, dom.canvas, state.comboFx);
+  if (state.pcFx) drawPerfectClearBanner(ctx, dom.canvas, state.pcFx);
 }
 
 function emitLineClearParticles(rows) {
@@ -194,6 +197,11 @@ function lockPiece() {
     if (state.combo >= COMBO_MIN_TO_SHOW) {
       triggerComboFx(state.combo);
       audio.playComboSfx(state.combo);
+    }
+    if (isBoardEmpty(state.board)) {
+      applyScore(perfectClearBonus(cleared, state.level));
+      state.pcFx = { life: PC_TEXT_DURATION, maxLife: PC_TEXT_DURATION };
+      audio.playPerfectClearSfx();
     }
   }
   if (!state.gameOver) spawn();
@@ -369,6 +377,10 @@ function loop(time) {
       state.comboFx.life -= dt;
       if (state.comboFx.life <= 0) state.comboFx = null;
     }
+    if (state.pcFx) {
+      state.pcFx.life -= dt;
+      if (state.pcFx.life <= 0) state.pcFx = null;
+    }
     if (state.shake) {
       state.shake.life -= dt;
       if (state.shake.life <= 0) state.shake = null;
@@ -391,6 +403,7 @@ function reset() {
   state.trails = [];
   state.combo = 0;
   state.comboFx = null;
+  state.pcFx = null;
   state.shake = null;
   state.paused = false;
   state.gameOver = false;
