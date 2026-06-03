@@ -337,3 +337,13 @@ play. Covered by `e2e/mode-select.spec.js` and `e2e/sprint.spec.js`; the existin
 gameplay specs auto-pick Zen via the shared fixture so they keep exercising the
 endless board. The win wiring itself relies on the unit-tested `isModeComplete`
 since clearing 40 real lines is impractical to force from the keyboard.
+
+## 29. Flag icon for the mode-switch button
+The floating mode-switch button now shows a monochrome ⚑ flag instead of the `▦`
+glyph, which read as ambiguous. The flag evokes a goal/race (fitting the 40 Linhas
+sprint) and, being a text glyph, inherits `color: var(--accent)` — so it changes
+color with the theme and inverts on hover, exactly like the ⚙ gear it mirrors (an
+emoji such as 🎮 would stay fixed-color and ignore the theme). A `U+FE0E` text
+variation selector forces the monochrome presentation. Pure cosmetic change to the
+button label in `index.html` — no logic touched; E2E specs select it by `#modeBtn`
+id so they stay green.

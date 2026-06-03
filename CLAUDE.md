@@ -95,7 +95,7 @@ TRETAI/
 ## Features
 
 - Classic Tetris: 7 tetrominoes, rotation with wall kicks, ghost piece, hold, soft/hard drop.
-- **Game modes**: a mode-select menu opens on every load (the first-visit tutorial hands off to it). **Zen** is the endless mode (score forever, level/speed climb). **40 Linhas** is a timed sprint — clear 40 lines as fast as possible at a fixed speed, ending in a `VITÓRIA!` overlay that records a per-mode best time (smaller is better). Modes are pure data in `modes.js` (`MODES`, `getMode`, `modeIds`, `isModeComplete`) declaring `goalLines`/`timed`/`levelProgression`/`startLevel`, so new modes are just data entries. The HUD adapts per mode (`configureHudForMode`): the Tempo box shows only when timed, Nível only when the level climbs, Linhas shows `n / goal`, and Recorde shows best time (sprint) or high score (zen). The stopwatch (`time.js` `formatTime`) accumulates only while unpaused; best times persist via `besttime.js` (key `BEST_TIME_KEY_PREFIX + modeId`). A floating ▦ button (mirroring the ⚙ gear, opposite corner) reopens the menu mid-run to switch modes or resume; the initial menu forces a choice (no Fechar, `Esc` ignored).
+- **Game modes**: a mode-select menu opens on every load (the first-visit tutorial hands off to it). **Zen** is the endless mode (score forever, level/speed climb). **40 Linhas** is a timed sprint — clear 40 lines as fast as possible at a fixed speed, ending in a `VITÓRIA!` overlay that records a per-mode best time (smaller is better). Modes are pure data in `modes.js` (`MODES`, `getMode`, `modeIds`, `isModeComplete`) declaring `goalLines`/`timed`/`levelProgression`/`startLevel`, so new modes are just data entries. The HUD adapts per mode (`configureHudForMode`): the Tempo box shows only when timed, Nível only when the level climbs, Linhas shows `n / goal`, and Recorde shows best time (sprint) or high score (zen). The stopwatch (`time.js` `formatTime`) accumulates only while unpaused; best times persist via `besttime.js` (key `BEST_TIME_KEY_PREFIX + modeId`). A floating ⚑ button (mirroring the ⚙ gear, opposite corner) reopens the menu mid-run to switch modes or resume; the initial menu forces a choice (no Fechar, `Esc` ignored).
 - **7-bag randomizer**: pieces are dealt from a shuffled bag of all 7 types, refilled when empty, so every window of 7 pieces contains exactly one of each — no droughts, no long repeats.
 - 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
 - Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
@@ -127,7 +127,7 @@ TRETAI/
 | M           | Music on/off        |
 | Enter       | Restart (game over) |
 
-The floating ▦ button (top-left) opens the mode-select menu at any time; the ⚙
+The floating ⚑ button (top-left) opens the mode-select menu at any time; the ⚙
 gear (top-right) opens the theme menu. `Esc` closes whichever menu is open
 (resuming the run if one is in progress).
 
