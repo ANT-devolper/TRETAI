@@ -29,6 +29,7 @@ import * as volume from './volume.js';
 import * as theme from './theme.js';
 import * as visited from './visited.js';
 import { getTheme, THEMES, themeIds } from './themes.js';
+import { getMode, DEFAULT_MODE_ID } from './modes.js';
 
 const state = {
   board: null,
@@ -47,6 +48,7 @@ const state = {
   paused: false,
   settingsOpen: false,
   tutorialOpen: false,
+  modeMenuOpen: false,
   gameOver: false,
   cell: 30,
   previewCell: 24,
@@ -58,6 +60,9 @@ const state = {
   shake: null,
   lastFrame: 0,
   theme: getTheme(),
+  mode: getMode(DEFAULT_MODE_ID),
+  elapsed: 0,
+  runStarted: false,
 };
 
 function renderBoard() {
@@ -125,8 +130,11 @@ function renderHold() {
 function applyScore(points, clearedLines = 0) {
   state.score += points;
   if (clearedLines) state.lines += clearedLines;
-  state.level = levelFromScore(state.score);
-  state.dropInterval = dropIntervalForLevel(state.level);
+  // Timed/sprint modes keep a fixed speed; only level-progressing modes climb.
+  if (state.mode.levelProgression) {
+    state.level = levelFromScore(state.score);
+    state.dropInterval = dropIntervalForLevel(state.level);
+  }
   renderStats(state.score, state.lines, state.level);
 }
 
@@ -390,12 +398,14 @@ function loop(time) {
   requestAnimationFrame(loop);
 }
 
-function reset() {
+function reset(mode = state.mode) {
+  state.mode = mode;
   state.board = newBoard();
   state.score = 0;
   state.lines = 0;
-  state.level = 1;
-  state.dropInterval = dropIntervalForLevel(1);
+  state.level = mode.startLevel;
+  state.dropInterval = dropIntervalForLevel(mode.startLevel);
+  state.elapsed = 0;
   state.lastDrop = 0;
   state.lockTimer = 0;
   state.lastFrame = 0;
