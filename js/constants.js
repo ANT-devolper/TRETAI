@@ -39,6 +39,10 @@ export const SCROLL_KEYS = [
 
 export const HIGH_SCORE_KEY = 'tretai.highScore';
 
+// Per-mode best time. The final key is BEST_TIME_KEY_PREFIX + modeId, so each
+// timed mode keeps its own record without a fixed key per mode.
+export const BEST_TIME_KEY_PREFIX = 'tretai.bestTime.';
+
 export const THEME_KEY = 'tretai.theme';
 
 export const VISITED_KEY = 'tretai.visited';
