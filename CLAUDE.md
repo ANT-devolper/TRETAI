@@ -31,6 +31,8 @@ TRETAI/
 │   ├── board.js            # newBoard, collides, merge, clearLines, computeGhostY (pure)
 │   ├── scoring.js          # lineScore, levelFromLines, dropIntervalForLevel (pure)
 │   ├── combo.js            # advanceCombo, comboBonus, comboParticleCount, comboToneFreq (pure)
+│   ├── modes.js            # MODES data + getMode/modeIds/isModeComplete (pure) — game modes
+│   ├── time.js             # formatTime(ms) → m:ss.cc (pure) — sprint stopwatch
 │   ├── render.js           # canvas drawing primitives (pure, take ctx + data)
 │   ├── ui.js               # DOM references, canvas ctx, renderStats, showOverlay, etc.
 │   ├── resize.js           # pure computeLayout(vw, vh); default reads from document
@@ -41,6 +43,7 @@ TRETAI/
 │   ├── themes.js           # THEMES data + getTheme/themeIds (pure) — palettes
 │   ├── theme.js            # selected-theme persistence (localStorage) + clampThemeId
 │   ├── highscore.js        # high-score persistence (localStorage) + isNew
+│   ├── besttime.js         # per-mode best-time persistence (localStorage) + isBetter
 │   ├── volume.js           # master-volume persistence (localStorage) + clampVolume
 │   ├── visited.js          # first-visit flag persistence (localStorage)
 │   └── game.js             # orchestrator: mutable state + loop + wiring
@@ -55,10 +58,13 @@ TRETAI/
 │   ├── trails.test.js
 │   ├── themes.test.js
 │   ├── highscore.test.js
-│   └── volume.test.js
+│   ├── volume.test.js
+│   ├── besttime.test.js
+│   ├── modes.test.js
+│   └── time.test.js
 └── e2e/                    # Playwright
     ├── audio-mock.js       # helper: replaces window.Audio with MockAudio
-    ├── fixtures.js         # helper: test/expect that seed the visited flag
+    ├── fixtures.js         # helper: seed visited flag + auto-pick Zen after navigation
     ├── smoke.spec.js
     ├── gameplay.spec.js
     ├── pause.spec.js
@@ -74,19 +80,22 @@ TRETAI/
     ├── sfx-mute.spec.js
     ├── volume.spec.js
     ├── tutorial.spec.js
-    └── theme.spec.js
+    ├── theme.spec.js
+    ├── mode-select.spec.js
+    └── sprint.spec.js
 ```
 
 ### Layers
 
-- **Pure** (no state, no DOM): `piece.js`, `bag.js`, `board.js`, `scoring.js`, `combo.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`.
-- **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners), `theme.js`/`highscore.js`/`volume.js`/`visited.js` (localStorage).
+- **Pure** (no state, no DOM): `piece.js`, `bag.js`, `board.js`, `scoring.js`, `combo.js`, `render.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`, `modes.js`, `time.js`.
+- **Isolated side effects**: `ui.js` (DOM), `audio.js` (HTMLAudioElement + localStorage), `input.js` (event listeners), `theme.js`/`highscore.js`/`volume.js`/`visited.js`/`besttime.js` (localStorage).
 - **Orchestration**: `game.js` is the only module with mutable game state. `audio.js` keeps its own encapsulated state.
 - **Bootstrap**: `main.js`.
 
 ## Features
 
 - Classic Tetris: 7 tetrominoes, rotation with wall kicks, ghost piece, hold, soft/hard drop.
+- **Game modes**: a mode-select menu opens on every load (the first-visit tutorial hands off to it). **Zen** is the endless mode (score forever, level/speed climb). **40 Linhas** is a timed sprint — clear 40 lines as fast as possible at a fixed speed, ending in a `VITÓRIA!` overlay that records a per-mode best time (smaller is better). Modes are pure data in `modes.js` (`MODES`, `getMode`, `modeIds`, `isModeComplete`) declaring `goalLines`/`timed`/`levelProgression`/`startLevel`, so new modes are just data entries. The HUD adapts per mode (`configureHudForMode`): the Tempo box shows only when timed, Nível only when the level climbs, Linhas shows `n / goal`, and Recorde shows best time (sprint) or high score (zen). The stopwatch (`time.js` `formatTime`) accumulates only while unpaused; best times persist via `besttime.js` (key `BEST_TIME_KEY_PREFIX + modeId`). A floating ▦ button (mirroring the ⚙ gear, opposite corner) reopens the menu mid-run to switch modes or resume; the initial menu forces a choice (no Fechar, `Esc` ignored).
 - **7-bag randomizer**: pieces are dealt from a shuffled bag of all 7 types, refilled when empty, so every window of 7 pieces contains exactly one of each — no droughts, no long repeats.
 - 500 ms lock delay when a piece touches the ground; the timer resets on each successful move/rotation so the player can slide and spin it into place. Hard drop still locks instantly; soft drop on a grounded piece is a no-op.
 - Hard drop visual trail: each filled cell of the dropped piece leaves a rectangle covering the path it travelled, drawn in the piece color with a translucent white wash on top and fading out in ~200 ms.
@@ -102,7 +111,7 @@ TRETAI/
   - Reduced volume (duck) on game over.
   - Armed after first interaction due to autoplay policy.
   - Mute via `M` is session-only; reload always starts armed.
-- **First-visit tutorial**: on the very first visit (no `tretai.visited` flag in `localStorage`) a "Como jogar" welcome screen — a full-screen modal mirroring the theme menu — opens with the game paused, listing the essential controls and the goal, plus a "Começar a jogar" button. Clicking it or pressing `Esc` dismisses the modal, marks the visit, and starts play. It never reappears afterwards (the panel's "Controles" box stays as the permanent reference).
+- **First-visit tutorial**: on the very first visit (no `tretai.visited` flag in `localStorage`) a "Como jogar" welcome screen — a full-screen modal mirroring the theme menu — opens with the game paused, listing the essential controls and the goal, plus a "Começar a jogar" button. Clicking it or pressing `Esc` dismisses the modal, marks the visit, and opens the mode-select menu. It never reappears afterwards (the panel's "Controles" box stays as the permanent reference).
 - **Theme switcher**: a settings gear (⚙) floating in the viewport's top-right corner pauses the game and opens a menu to pick a theme. Themes available: **Clássico** (the original cyan-on-black look), **Game Boy** (monochrome DMG green), **Neon** (synthwave), **Sunset** (vaporwave) and **Pastel** (light mode). Switching repaints both the canvas (piece colors + board background/grid, plus a per-theme ghost color so it stays visible on light boards) and the whole DOM (panel/background accents); the choice persists across reloads. While the menu is open the game stays paused: `P` is ignored, `Esc` closes the menu (resuming the game, like the Fechar button), and selecting a theme also closes the menu and resumes.
 
 ### Controls
@@ -117,6 +126,10 @@ TRETAI/
 | P / Esc     | Pause               |
 | M           | Music on/off        |
 | Enter       | Restart (game over) |
+
+The floating ▦ button (top-left) opens the mode-select menu at any time; the ⚙
+gear (top-right) opens the theme menu. `Esc` closes whichever menu is open
+(resuming the run if one is in progress).
 
 ## Development guidelines
 
@@ -197,7 +210,7 @@ D. **Definition of Done** — a change is done only when all of these hold:
 
 ### Tests
 
-22. **Every pure function needs a unit test.** New behavior in any module of the Pure layer (`piece.js`, `bag.js`, `board.js`, `scoring.js`, `combo.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`) requires a matching case under `tests/`. The lone exception is `render.js`: it is pure but draws to a canvas, so its output is verified by E2E pixel-sampling specs (rule 23) rather than unit tests.
+22. **Every pure function needs a unit test.** New behavior in any module of the Pure layer (`piece.js`, `bag.js`, `board.js`, `scoring.js`, `combo.js`, `resize.js`, `particles.js`, `trails.js`, `themes.js`, `modes.js`, `time.js`) requires a matching case under `tests/`. The lone exception is `render.js`: it is pure but draws to a canvas, so its output is verified by E2E pixel-sampling specs (rule 23) rather than unit tests.
 23. **DOM, audio and integration → E2E.** Do not try to emulate DOM in Node; use Playwright under `e2e/` for real flows.
 24. **Test behavior, not implementation.** Assertions on input→output or observable state (DOM, `localStorage`); never on internal module details.
 25. **Refactor for testability when useful.** If a pure function gets trapped behind side effects, extract the pure part to accept parameters (e.g., `computeLayout(vw, vh)`).

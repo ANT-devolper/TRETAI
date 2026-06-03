@@ -311,3 +311,29 @@ The banner (`drawPerfectClearBanner`, mirroring `drawComboBanner`) and the SFX
 (`playPerfectClearSfx`, mirroring `playLineClearSfx`) are verified by
 `e2e/perfect-clear.spec.js` via pixel-sampling and oscillator counting, since a
 real Perfect Clear is impractical to force from the keyboard.
+
+## 28. Game modes (Zen + 40 Linhas) and the mode-select menu
+The game was a single endless run; it now has selectable **modes**, chosen from
+a menu that opens on every load. **Zen** is the previous endless mode (score
+forever, level/speed climb). **40 Linhas** is a timed sprint: clear 40 lines as
+fast as possible, at a fixed speed, ending in a `VITÓRIA!` overlay that records a
+per-mode best time. The architecture is built to extend: modes are pure data in
+`js/modes.js` (`MODES`, `getMode`, `modeIds`, `isModeComplete`), so a new mode is
+just another entry declaring `goalLines`, `timed`, `levelProgression` and
+`startLevel`. Two more pure/isolated helpers back it: `js/time.js`
+(`formatTime` → `m:ss.cc`) and `js/besttime.js` (per-mode best time in
+`localStorage` under `BEST_TIME_KEY_PREFIX + modeId`, where *smaller is better*) —
+all three unit-tested red→green. In `game.js`, `reset(mode)` seeds a run from a
+mode, `applyScore` only climbs the level when the mode opts in, the loop
+accumulates `elapsed` per frame (so pauses don't count) for timed modes, and
+`finishRun` ends the run on `isModeComplete`. The HUD adapts per mode
+(`configureHudForMode`): the Tempo box shows only when timed, the Nível box only
+when the level climbs, Linhas shows `n / goal`, and the Recorde box shows the
+best time (sprint) or the high score (zen). The menu mirrors the settings modal,
+forces a choice on first load (no Fechar, Esc ignored), and a floating ▦ button
+(mirroring the ⚙ gear, opposite corner) reopens it mid-run to switch modes or
+resume. The first-visit tutorial now hands off to the menu instead of starting
+play. Covered by `e2e/mode-select.spec.js` and `e2e/sprint.spec.js`; the existing
+gameplay specs auto-pick Zen via the shared fixture so they keep exercising the
+endless board. The win wiring itself relies on the unit-tested `isModeComplete`
+since clearing 40 real lines is impractical to force from the keyboard.
