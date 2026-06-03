@@ -392,6 +392,74 @@ canvas {
   background: var(--accent-hover);
 }
 
+/* Mode-selection menu: mirrors the settings menu (fullscreen modal). */
+.mode-menu {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(8px, 1.5vh, 16px);
+  z-index: 60;
+  padding: clamp(16px, 4vmin, 32px);
+}
+
+.mode-menu.show {
+  display: flex;
+}
+
+.mode-menu h2 {
+  color: var(--accent);
+  font-size: clamp(18px, 3vh, 26px);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1vh, 12px);
+  width: 100%;
+  max-width: 300px;
+}
+
+.mode-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: clamp(10px, 1.6vh, 14px);
+  background: var(--bg-box);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mode-option:hover {
+  border-color: var(--accent);
+}
+
+.mode-option.active {
+  border-color: var(--accent);
+  background: var(--bg-box-active, var(--bg-box));
+}
+
+.mode-option .mode-name {
+  font-size: clamp(13px, 1.8vh, 17px);
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.mode-option .mode-desc {
+  font-size: clamp(11px, 1.4vh, 13px);
+  color: var(--label);
+}
+
 /* First-visit tutorial: mirrors the settings menu (fullscreen modal). */
 .tutorial-menu {
   position: fixed;

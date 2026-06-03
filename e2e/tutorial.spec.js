@@ -13,24 +13,27 @@ test.describe('First-visit tutorial', () => {
     await expect(tutorial).toContainText('Girar');
   });
 
-  test('dismisses with the start button and does not reappear after reload', async ({ page }) => {
+  test('start button hands off to the mode menu and the tutorial stays gone', async ({ page }) => {
     await mockAudio(page);
     await page.goto('/');
 
     await page.locator('#tutorialStart').click();
     await expect(page.locator('#tutorial')).toBeHidden();
+    // Dismissing the tutorial opens the mode-select menu instead of starting play.
+    await expect(page.locator('#modeMenu')).toBeVisible();
 
     await page.reload();
     await expect(page.locator('#tutorial')).toBeHidden();
   });
 
-  test('Esc also dismisses the tutorial', async ({ page }) => {
+  test('Esc dismisses the tutorial and opens the mode menu', async ({ page }) => {
     await mockAudio(page);
     await page.goto('/');
 
     await expect(page.locator('#tutorial')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.locator('#tutorial')).toBeHidden();
+    await expect(page.locator('#modeMenu')).toBeVisible();
   });
 
   test('does not show when the visited flag is already set', async ({ page }) => {
@@ -41,5 +44,6 @@ test.describe('First-visit tutorial', () => {
     await page.goto('/');
 
     await expect(page.locator('#tutorial')).toBeHidden();
+    await expect(page.locator('#modeMenu')).toBeVisible();
   });
 });

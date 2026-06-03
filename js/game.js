@@ -20,6 +20,7 @@ import {
   dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
   renderVolume, measurePanelNaturalHeight, applyPanelScale,
   applyTheme, renderThemeOptions, showSettings, hideSettings, showTutorial, hideTutorial,
+  renderModeOptions, showModeMenu, hideModeMenu,
 } from './ui.js';
 import { computeLayout, scaleToFit } from './resize.js';
 import { bindKeyboard } from './input.js';
@@ -29,7 +30,7 @@ import * as volume from './volume.js';
 import * as theme from './theme.js';
 import * as visited from './visited.js';
 import { getTheme, THEMES, themeIds } from './themes.js';
-import { getMode, DEFAULT_MODE_ID } from './modes.js';
+import { getMode, modeIds, MODES, DEFAULT_MODE_ID } from './modes.js';
 
 const state = {
   board: null,
@@ -63,6 +64,7 @@ const state = {
   mode: getMode(DEFAULT_MODE_ID),
   elapsed: 0,
   runStarted: false,
+  musicWasPlaying: false,
 };
 
 function renderBoard() {
@@ -307,6 +309,49 @@ function closeSettings() {
   }
 }
 
+function refreshModeOptions() {
+  renderModeOptions(
+    modeIds().map(id => ({ id, name: MODES[id].name, description: MODES[id].description })),
+    state.mode.id,
+    selectMode,
+  );
+}
+
+// The mode menu mirrors the settings menu: it opens paused. We remember whether
+// the music was playing so selecting/closing only resumes it when it should —
+// keeping the very first load silent until the player's first keypress.
+function openModeMenu() {
+  refreshModeOptions();
+  state.musicWasPlaying = audio.isPlaying();
+  if (!state.paused) {
+    state.paused = true;
+    audio.pauseForGame();
+  }
+  state.modeMenuOpen = true;
+  showModeMenu(state.runStarted);
+}
+
+function selectMode(id) {
+  state.modeMenuOpen = false;
+  hideModeMenu();
+  state.runStarted = true;
+  reset(getMode(id));
+  if (state.musicWasPlaying) audio.resumeForGame();
+  applyLayout();
+}
+
+// Only effective once a run has started: the initial menu forces a choice.
+function closeModeMenu() {
+  if (!state.runStarted) return;
+  state.modeMenuOpen = false;
+  hideModeMenu();
+  if (state.paused) {
+    state.paused = false;
+    if (state.musicWasPlaying) audio.resumeForGame();
+    state.lastDrop = 0;
+  }
+}
+
 // First-visit welcome screen: opens paused (like the settings menu) so new
 // players can read the controls before the game starts dropping.
 function openTutorial() {
@@ -320,9 +365,8 @@ function closeTutorial() {
   state.tutorialOpen = false;
   visited.markVisited();
   hideTutorial();
-  state.paused = false;
-  audio.resumeForGame();
-  state.lastDrop = 0;
+  // First visit flows into the mode menu instead of starting play directly.
+  openModeMenu();
 }
 
 function withTurn(action) {
@@ -443,9 +487,13 @@ export function start() {
     rotate: withTurn(tryRotate),
     hardDrop: withTurn(hardDrop),
     hold: withTurn(holdAction),
-    pause: () => { if (state.tutorialOpen || state.settingsOpen) return; togglePause(); },
+    pause: () => {
+      if (state.tutorialOpen || state.settingsOpen || state.modeMenuOpen) return;
+      togglePause();
+    },
     escape: () => {
       if (state.tutorialOpen) { closeTutorial(); return; }
+      if (state.modeMenuOpen) { closeModeMenu(); return; }
       if (state.settingsOpen) { closeSettings(); return; }
       togglePause();
     },
@@ -453,10 +501,11 @@ export function start() {
     toggleMusic: () => audio.toggle(),
   });
   window.addEventListener('resize', applyLayout);
-  dom.restartBtn.addEventListener('click', reset);
+  dom.restartBtn.addEventListener('click', () => reset());
   dom.settingsBtn.addEventListener('click', openSettings);
   dom.settingsClose.addEventListener('click', closeSettings);
   dom.tutorialStart.addEventListener('click', closeTutorial);
+  dom.modeClose.addEventListener('click', closeModeMenu);
   dom.musicBtn.addEventListener('click', () => audio.toggle());
   const initialVolume = volume.read();
   audio.setVolume(initialVolume);
@@ -468,6 +517,10 @@ export function start() {
   });
   audio.onStateChange(renderMusicState);
   renderMusicState({ playing: audio.isPlaying() });
+  refreshModeOptions();
+  // First visit shows the tutorial, which then opens the mode menu; afterwards
+  // the mode menu is the landing screen. Either way the player picks a mode.
   if (!visited.read()) openTutorial();
+  else openModeMenu();
   requestAnimationFrame(loop);
 }

@@ -21,6 +21,9 @@ export const dom = {
   themeOptions: document.getElementById('themeOptions'),
   tutorial: document.getElementById('tutorial'),
   tutorialStart: document.getElementById('tutorialStart'),
+  modeMenu: document.getElementById('modeMenu'),
+  modeOptions: document.getElementById('modeOptions'),
+  modeClose: document.getElementById('modeClose'),
 };
 
 export const ctx = dom.canvas.getContext('2d');
@@ -123,4 +126,42 @@ export function showTutorial() {
 
 export function hideTutorial() {
   dom.tutorial.classList.remove('show');
+}
+
+// (Re)build the mode option buttons, marking the active one. Mirrors
+// renderThemeOptions but each button shows a name plus a short description.
+export function renderModeOptions(modes, activeId, onSelect) {
+  if (!dom.modeOptions) return;
+  dom.modeOptions.replaceChildren();
+  for (const { id, name, description } of modes) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mode-option';
+    btn.dataset.mode = id;
+    const active = id === activeId;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', String(active));
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'mode-name';
+    nameEl.textContent = name;
+    const descEl = document.createElement('span');
+    descEl.className = 'mode-desc';
+    descEl.textContent = description;
+    btn.append(nameEl, descEl);
+
+    btn.addEventListener('click', () => onSelect(id));
+    dom.modeOptions.appendChild(btn);
+  }
+}
+
+// showClose hides the Fechar button on the very first (initial) menu, where the
+// player must pick a mode; once a run is underway it reappears to resume.
+export function showModeMenu(showClose) {
+  dom.modeClose.hidden = !showClose;
+  dom.modeMenu.classList.add('show');
+}
+
+export function hideModeMenu() {
+  dom.modeMenu.classList.remove('show');
 }
