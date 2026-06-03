@@ -20,7 +20,7 @@ import {
   dom, ctx, nextCtx, holdCtx, renderStats, renderBest, showOverlay, hideOverlay, renderMusicState,
   renderVolume, measurePanelNaturalHeight, applyPanelScale,
   applyTheme, renderThemeOptions, showSettings, hideSettings, showTutorial, hideTutorial,
-  renderModeOptions, showModeMenu, hideModeMenu,
+  renderModeOptions, showModeMenu, hideModeMenu, renderTimer, configureHudForMode,
 } from './ui.js';
 import { computeLayout, scaleToFit } from './resize.js';
 import { bindKeyboard } from './input.js';
@@ -29,8 +29,10 @@ import * as highscore from './highscore.js';
 import * as volume from './volume.js';
 import * as theme from './theme.js';
 import * as visited from './visited.js';
+import * as besttime from './besttime.js';
 import { getTheme, THEMES, themeIds } from './themes.js';
-import { getMode, modeIds, MODES, DEFAULT_MODE_ID } from './modes.js';
+import { getMode, modeIds, MODES, DEFAULT_MODE_ID, isModeComplete } from './modes.js';
+import { formatTime } from './time.js';
 
 const state = {
   board: null,
@@ -43,6 +45,7 @@ const state = {
   lines: 0,
   level: 1,
   best: 0,
+  bestTime: 0,
   dropInterval: dropIntervalForLevel(1),
   lastDrop: 0,
   lockTimer: 0,
@@ -129,6 +132,22 @@ function renderHold() {
   );
 }
 
+function linesDisplay() {
+  return state.mode.goalLines != null
+    ? `${state.lines} / ${state.mode.goalLines}`
+    : state.lines;
+}
+
+// The record box shows the best time in timed modes (— when none yet) and the
+// high score otherwise.
+function renderRecord() {
+  if (state.mode.timed) {
+    renderBest(state.bestTime > 0 ? formatTime(state.bestTime) : '—');
+  } else {
+    renderBest(state.best);
+  }
+}
+
 function applyScore(points, clearedLines = 0) {
   state.score += points;
   if (clearedLines) state.lines += clearedLines;
@@ -137,7 +156,7 @@ function applyScore(points, clearedLines = 0) {
     state.level = levelFromScore(state.score);
     state.dropInterval = dropIntervalForLevel(state.level);
   }
-  renderStats(state.score, state.lines, state.level);
+  renderStats(state.score, linesDisplay(), state.level);
 }
 
 function pullPiece() {
@@ -214,7 +233,25 @@ function lockPiece() {
       audio.playPerfectClearSfx();
     }
   }
+  if (cleared > 0 && isModeComplete(state.mode, state.lines)) finishRun();
   if (!state.gameOver) spawn();
+}
+
+// Reaching a mode's line goal ends the run as a win: freeze the loop, record a
+// new best time when faster, and show the victory overlay with the final time.
+function finishRun() {
+  state.gameOver = true;
+  const prev = state.bestTime;
+  let detail = `Tempo: ${formatTime(state.elapsed)}`;
+  if (besttime.isBetter(state.elapsed, prev)) {
+    besttime.write(state.mode.id, state.elapsed);
+    state.bestTime = state.elapsed;
+    renderRecord();
+    detail = `NOVO RECORDE!\n${formatTime(state.elapsed)}`;
+    if (prev > 0) detail += `\n(antes: ${formatTime(prev)})`;
+  }
+  showOverlay('VITÓRIA!', true, detail);
+  audio.duck(true);
 }
 
 function softDrop() {
@@ -409,6 +446,10 @@ function loop(time) {
     const frameMs = time - state.lastFrame;
     const dt = Math.min(0.1, frameMs / 1000);
     state.lastFrame = time;
+    if (state.mode.timed) {
+      state.elapsed += frameMs;
+      renderTimer(state.elapsed);
+    }
     const grounded = collides(state.board, state.current, 0, 1);
     if (grounded) {
       state.lockTimer += frameMs;
@@ -444,6 +485,7 @@ function loop(time) {
 
 function reset(mode = state.mode) {
   state.mode = mode;
+  state.bestTime = mode.timed ? besttime.read(mode.id) : 0;
   state.board = newBoard();
   state.score = 0;
   state.lines = 0;
@@ -467,8 +509,10 @@ function reset(mode = state.mode) {
   state.next = pullPiece();
   spawn();
   renderHold();
-  renderStats(state.score, state.lines, state.level);
-  renderBest(state.best);
+  configureHudForMode(mode);
+  renderStats(state.score, linesDisplay(), state.level);
+  renderRecord();
+  renderTimer(state.elapsed);
   hideOverlay();
   audio.duck(false);
 }

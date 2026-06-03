@@ -1,3 +1,5 @@
+import { formatTime } from './time.js';
+
 export const dom = {
   canvas: document.getElementById('board'),
   nextCanvas: document.getElementById('next'),
@@ -6,6 +8,9 @@ export const dom = {
   linesEl: document.getElementById('lines'),
   levelEl: document.getElementById('level'),
   bestEl: document.getElementById('best'),
+  timerEl: document.getElementById('timer'),
+  timerBox: document.getElementById('timerBox'),
+  levelBox: document.getElementById('levelBox'),
   overlay: document.getElementById('overlay'),
   overlayText: document.getElementById('overlayText'),
   overlayDetail: document.getElementById('overlayDetail'),
@@ -38,6 +43,17 @@ export function renderStats(score, lines, level) {
 
 export function renderBest(best) {
   dom.bestEl.textContent = best;
+}
+
+export function renderTimer(ms) {
+  if (dom.timerEl) dom.timerEl.textContent = formatTime(ms);
+}
+
+// Show/hide the mode-specific HUD boxes: the timer appears only in timed modes,
+// the level box only when the mode lets the level climb.
+export function configureHudForMode(mode) {
+  if (dom.timerBox) dom.timerBox.classList.toggle('is-hidden', !mode.timed);
+  if (dom.levelBox) dom.levelBox.classList.toggle('is-hidden', !mode.levelProgression);
 }
 
 export function showOverlay(text, withRestart = false, detail = null) {
@@ -163,5 +179,9 @@ export function showModeMenu(showClose) {
 }
 
 export function hideModeMenu() {
+  // Drop focus from the just-clicked option first: while the menu is up the
+  // chosen button holds focus, and a later Enter would re-fire its click
+  // (resetting the run). Blur sends focus back to the body.
+  if (dom.modeMenu.contains(document.activeElement)) document.activeElement.blur();
   dom.modeMenu.classList.remove('show');
 }

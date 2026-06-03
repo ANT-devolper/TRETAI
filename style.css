@@ -116,6 +116,11 @@ canvas {
   border-radius: 4px;
 }
 
+/* Mode-specific HUD boxes toggle this to drop out of the panel flow. */
+.box.is-hidden {
+  display: none;
+}
+
 .box h2 {
   font-size: clamp(10px, 1.2vh, 14px);
   color: var(--label);
