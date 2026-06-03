@@ -26,6 +26,7 @@ export const dom = {
   themeOptions: document.getElementById('themeOptions'),
   tutorial: document.getElementById('tutorial'),
   tutorialStart: document.getElementById('tutorialStart'),
+  modeBtn: document.getElementById('modeBtn'),
   modeMenu: document.getElementById('modeMenu'),
   modeOptions: document.getElementById('modeOptions'),
   modeClose: document.getElementById('modeClose'),

@@ -46,4 +46,35 @@ test.describe('Mode selection', () => {
     await page.locator('#modeOptions button[data-mode="sprint"]').click();
     await expect(page.locator('#modeMenu')).toBeHidden();
   });
+
+  test('the mode button reopens the menu mid-run with a Fechar option', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#modeOptions button[data-mode="zen"]').click();
+    await expect(page.locator('#modeMenu')).toBeHidden();
+
+    await page.locator('#modeBtn').click();
+    await expect(page.locator('#modeMenu')).toBeVisible();
+    await expect(page.locator('#modeClose')).toBeVisible();
+  });
+
+  test('Fechar resumes the current run without changing mode', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#modeOptions button[data-mode="zen"]').click();
+
+    await page.locator('#modeBtn').click();
+    await page.locator('#modeClose').click();
+    await expect(page.locator('#modeMenu')).toBeHidden();
+    await expect(page.locator('#board')).toBeVisible();
+  });
+
+  test('the mode button switches the active mode mid-run', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#modeOptions button[data-mode="zen"]').click();
+    await expect(page.locator('#timerBox')).toBeHidden();
+
+    await page.locator('#modeBtn').click();
+    await page.locator('#modeOptions button[data-mode="sprint"]').click();
+    await expect(page.locator('#modeMenu')).toBeHidden();
+    await expect(page.locator('#timerBox')).toBeVisible();
+  });
 });

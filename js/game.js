@@ -549,6 +549,7 @@ export function start() {
   dom.settingsBtn.addEventListener('click', openSettings);
   dom.settingsClose.addEventListener('click', closeSettings);
   dom.tutorialStart.addEventListener('click', closeTutorial);
+  dom.modeBtn.addEventListener('click', openModeMenu);
   dom.modeClose.addEventListener('click', closeModeMenu);
   dom.musicBtn.addEventListener('click', () => audio.toggle());
   const initialVolume = volume.read();
