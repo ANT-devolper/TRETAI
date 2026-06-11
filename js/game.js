@@ -341,6 +341,7 @@ function closeSettings() {
   hideSettings();
   if (state.paused) {
     state.paused = false;
+    hideOverlay();
     audio.resumeForGame();
     state.lastDrop = 0;
   }
@@ -384,6 +385,7 @@ function closeModeMenu() {
   hideModeMenu();
   if (state.paused) {
     state.paused = false;
+    hideOverlay();
     if (state.musicWasPlaying) audio.resumeForGame();
     state.lastDrop = 0;
   }

@@ -347,3 +347,14 @@ emoji such as 🎮 would stay fixed-color and ignore the theme). A `U+FE0E` text
 variation selector forces the monochrome presentation. Pure cosmetic change to the
 button label in `index.html` — no logic touched; E2E specs select it by `#modeBtn`
 id so they stay green.
+
+## 30. Fix: PAUSADO overlay stuck after resuming via a menu (issue #1)
+Pausing the game manually (`P`/`Esc`) shows the `PAUSADO` overlay. Opening the
+theme menu (⚙) and picking a theme — or opening the mode menu (⚑) and closing it
+— resumed the run (pieces dropped, music returned) but left the overlay frozen on
+top. `togglePause`'s resume branch hides the overlay, but `closeSettings` and
+`closeModeMenu` only flipped `state.paused` and resumed audio, never calling
+`hideOverlay`. Added the missing `hideOverlay()` to both resume branches in
+`game.js`. Two E2E regression tests cover the twin flows (`theme.spec.js`,
+`mode-select.spec.js`): pause manually, act through the menu, assert `#overlay`
+loses its `show` class and the run truly resumes.

@@ -77,4 +77,22 @@ test.describe('Mode selection', () => {
     await expect(page.locator('#modeMenu')).toBeHidden();
     await expect(page.locator('#timerBox')).toBeVisible();
   });
+
+  // Regression (issue #1, twin of the theme-menu bug): pausing manually shows the
+  // PAUSADO overlay; closing the mid-run mode menu must resume *and* hide it.
+  test('closing the mode menu from a manually paused run hides the PAUSADO overlay', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#modeOptions button[data-mode="zen"]').click();
+
+    await page.keyboard.press('p');
+    await expect(page.locator('#overlay')).toHaveClass(/show/);
+
+    await page.locator('#modeBtn').click();
+    await page.locator('#modeClose').click();
+
+    await expect(page.locator('#modeMenu')).toBeHidden();
+    await expect(page.locator('#overlay')).not.toHaveClass(/show/);
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('1');
+  });
 });

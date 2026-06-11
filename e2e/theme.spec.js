@@ -158,4 +158,21 @@ test.describe('Theme switcher', () => {
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('#score')).toHaveText('1');
   });
+
+  // Regression: pausing manually shows the PAUSADO overlay; picking a theme from
+  // that paused state must resume the game *and* hide the overlay (issue #1).
+  test('selecting a theme from a manually paused game hides the PAUSADO overlay', async ({ page }) => {
+    await page.goto('/');
+    await page.keyboard.press('p');
+    await expect(page.locator('#overlay')).toHaveClass(/show/);
+
+    await page.locator('#settingsBtn').click();
+    await page.locator('.theme-option[data-theme="neon"]').click();
+
+    await expect(page.locator('#settingsMenu')).not.toHaveClass(/show/);
+    await expect(page.locator('#overlay')).not.toHaveClass(/show/);
+    // The run truly resumed.
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#score')).toHaveText('1');
+  });
 });
